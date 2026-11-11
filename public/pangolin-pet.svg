@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="440" viewBox="0 0 900 440">
+  <defs>
+    <pattern id="grain" width="24" height="17" patternUnits="userSpaceOnUse">
+      <path d="M3 4h1m13 4h1m-8 8h1m-5-4h1" stroke="#f9e2a7" stroke-width=".85" opacity=".55"/>
+    </pattern>
+    <pattern id="scales" width="49" height="30" patternUnits="userSpaceOnUse">
+      <path d="M-24 2h49c-3 13-13 23-25 26C-12 24-21 13-24 2Zm49 0h49c-3 13-13 23-25 26C37 24 28 13 25 2ZM0-13h49c-3 13-13 23-25 26C12 9 3-2 0-13Z" fill="#a98758" stroke="#614e3c" stroke-width="1.8"/>
+      <path d="M0 5v14m24-24V4" stroke="#d1ac72" stroke-width="1.2" stroke-linecap="round"/>
+    </pattern>
+    <clipPath id="scaly-back">
+      <path d="M333 270c20-37 70-61 120-61 64 0 96 28 125 54 48 44 100 62 164 57-24 26-88 43-146 22-35-12-58-32-82-35-43 32-112 38-162 2Z"/>
+    </clipPath>
+  </defs>
+  <path d="M386 312c-19 10-37 31-33 44 3 10 25 9 33 1l31-28m72-19c8 13 18 21 37 26 12 3 14 13 5 19-15 10-36 7-56-5-12-7-25-17-31-28" fill="#8b7953" stroke="#5a4e3e" stroke-width="4" stroke-linecap="round"/>
+  <path d="M357 274c-12-10-32-11-54-4-28 9-47 35-66 53 11 8 24 6 36 3 19-6 36-13 55-9 23 5 39-1 48-14Z" fill="#b7a47a" stroke="#594e3f" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M237 323c9-1 13-5 18-10-1 9-7 13-14 13Z" fill="#584e41"/>
+  <path d="M290 297q6-5 13-2" fill="none" stroke="#544c3a" stroke-width="3.7" stroke-linecap="round"/>
+  <path d="M313 282c-1-8 4-14 9-13 4 2 6 8 3 13" fill="#cebb8d" stroke="#685a43" stroke-width="2.3"/>
+  <path d="M333 270c20-37 70-61 120-61 64 0 96 28 125 54 48 44 100 62 164 57-24 26-88 43-146 22-35-12-58-32-82-35-43 32-112 38-162 2Z" fill="#a9895a" stroke="#5a4e3e" stroke-width="4" stroke-linejoin="round"/>
+  <g clip-path="url(#scaly-back)">
+    <path d="M324 205h433v147H324Z" fill="url(#scales)"/>
+    <path d="M333 282c66 50 120 24 187 10 53-11 133 80 227 26v39H333Z" fill="#735a41" opacity=".45"/>
+    <path d="M333 270c20-37 70-61 120-61 64 0 96 28 125 54 48 44 100 62 164 57" fill="none" stroke="#dbba80" stroke-width="4"/>
+    <path d="M325 206h433v152H325Z" fill="url(#grain)"/>
+  </g>
+  <path d="M357 348l-6 6m13-4-3 7m161-9 6 3m-13-2 6 5" stroke="#d1bd8e" stroke-width="2" stroke-linecap="round"/>
+</svg>

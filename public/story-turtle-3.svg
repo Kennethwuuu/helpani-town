@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300">
+  <style>
+    .route { animation: trace 2.8s ease-out both; }
+    .arrival { animation: arrival 1.7s ease-out .7s both; transform-box: fill-box; transform-origin: center; }
+    @keyframes trace { from { stroke-dashoffset: 70; opacity: .35; } }
+    @keyframes arrival { from { transform: scale(.75); opacity: .35; } 45% { transform: scale(1.28); } }
+    @media (prefers-reduced-motion: reduce) { .route, .arrival { animation: none; } }
+  </style>
+  <defs>
+    <linearGradient id="desk" x2="0" y2="1"><stop stop-color="#856d52"/><stop offset="1" stop-color="#584f41"/></linearGradient>
+    <linearGradient id="paper" x2="1" y2="1"><stop stop-color="#f5e7ba"/><stop offset="1" stop-color="#ddc99d"/></linearGradient>
+    <linearGradient id="sea" x2="0" y2="1"><stop stop-color="#598c82"/><stop offset="1" stop-color="#326461"/></linearGradient>
+    <pattern id="fiber" width="27" height="23" patternUnits="userSpaceOnUse"><path d="m4 5 2-1m14 6 2-1m-7 9 3-1" stroke="#714d39" opacity=".15" fill="none" stroke-width="1"/></pattern>
+  </defs>
+  <path d="M0 0h720v300H0Z" fill="url(#desk)"/>
+  <path d="M0 30q175 19 345-1t375 2M0 109q187 19 363-3t357 1M0 233q171-19 354 4t366-2" fill="none" stroke="#b39871" stroke-width="2" opacity=".36"/>
+  <g transform="rotate(-3 290 151)">
+    <rect x="34" y="26" width="532" height="255" rx="10" fill="#413b30" opacity=".37"/>
+    <rect x="29" y="18" width="532" height="255" rx="10" fill="url(#paper)"/>
+    <rect x="29" y="18" width="532" height="255" rx="10" fill="url(#fiber)"/>
+    <rect x="48" y="37" width="495" height="218" rx="3" fill="url(#sea)"/>
+    <path d="M48 130q49-19 64 16t37 53q31 12 20 56H48Zm495-93v70q-30 16-58 8-29-10-56 11-26 23-63 2-15-9 8-23 42-18 45-40 2-15 34-28Z" fill="#b6bb82" stroke="#d6d69a" stroke-width="2"/>
+    <path d="M272 130q13 2 16 13t-11 11q-17-1-23-8t18-16Zm41 46q16-13 30-4 13 8 7 16t-27 4q-18-4-10-16Z" fill="#a5b386" stroke="#d0d59d" stroke-width="2"/>
+    <path d="M178 94q17 3 31-1m8 37q12 2 23-2m115 40q17 3 31-2m25 44q19 3 36-4m-222 10q14 3 31-1" fill="none" stroke="#a6cdb2" opacity=".6" stroke-width="2" stroke-linecap="round"/>
+    <path class="route" d="M111 196C167 216 199 168 244 162s66 41 119 3c28-20 39-46 85-59" fill="none" stroke="#b5e5ed" stroke-width="4.5" stroke-dasharray="4 10" stroke-linecap="round"/>
+    <circle cx="111" cy="196" r="7" fill="#f2d586" stroke="#3b605a" stroke-width="2"/>
+    <g class="arrival"><circle cx="448" cy="106" r="11" fill="#f2d586" stroke="#3b605a" stroke-width="2"/><circle cx="448" cy="106" r="4" fill="#527970"/></g>
+    <g transform="translate(109 82)" fill="#d8deb3" stroke="#d8deb3" opacity=".85">
+      <circle r="23" fill="none" stroke-width="1.4"/>
+      <path d="m0-30 4 22 14 8-14 4L0 23-4 4l-14-4 14-8Z" stroke-width="1"/>
+      <circle r="3.5" fill="#557f77" stroke="none"/>
+    </g>
+  </g>
+  <g transform="translate(493 35) rotate(9)">
+    <rect x="4" y="6" width="171" height="206" rx="5" fill="#38352e" opacity=".5"/>
+    <rect width="171" height="206" rx="5" fill="#f6e7bd"/>
+    <path d="M11 11h149v156H11Z" fill="#59857b"/>
+    <path d="M11 98q45-24 87-1t62-1v71H11Z" fill="#4d766d"/>
+    <path d="M11 138q34-17 64-14 36 4 85 20v23H11Z" fill="#e2bc81"/>
+    <path d="M11 136q34-17 64-14 36 4 85 20" fill="none" stroke="#e7d9a2" stroke-width="2.4"/>
+    <circle cx="110" cy="58" r="20" fill="#e4c890"/>
+    <path d="M21 109q21-5 36-3m57 10q18 4 33 2m-74 37q10 1 20 4" fill="none" stroke="#c6cda4" stroke-width="2" stroke-linecap="round"/>
+    <path d="M0 0h171v206H0Z" fill="url(#fiber)" opacity=".5"/>
+  </g>
+</svg>

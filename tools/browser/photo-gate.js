@@ -1,0 +1,33 @@
+async (page) => {
+  const check=(ok,message)=>{if(!ok)throw new Error(message);};
+  await page.waitForFunction(()=>helpaniWoodland.snapshot().layout.platform==='edge'&&helpaniWoodland.snapshot().mode==='platform-rest',{},{timeout:60000});
+  await page.locator('#wood-canvas').screenshot({path:'output/playwright/platform-edge.png'});
+  check(await page.evaluate(()=>helpaniWoodland.state().growth.length===1),'move duplicated growth');
+  await page.reload(); await page.waitForFunction(()=>window.helpaniWoodland?.state()?.layout.platform==='edge');
+  await page.setViewportSize({width:390,height:844});
+  await page.locator('#wood-canvas').scrollIntoViewIfNeeded();
+  await page.screenshot({path:'output/playwright/woodland-mobile.png'});
+  check(await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth),'mobile horizontal overflow');
+  await page.getByRole('button',{name:'◉ 打开相机',exact:true}).click();
+  await page.getByRole('button',{name:'放大镜头',exact:true}).click();
+  await page.getByRole('button',{name:'拍下这一刻',exact:true}).click();
+  await page.waitForFunction(()=>document.querySelector('#wood-photo-preview').src.startsWith('blob:')&&!document.querySelector('#wood-photo-save').disabled);
+  await page.locator('#wood-crop').fill('1.2');
+  await page.waitForFunction(()=>!document.querySelector('#wood-photo-save').disabled);
+  const hash=await page.evaluate(async()=>{const bytes=await (await fetch(document.querySelector('#wood-photo-preview').src)).arrayBuffer();return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(b=>b.toString(16).padStart(2,'0')).join('');});
+  const downloadPromise=page.waitForEvent('download'); await page.getByRole('button',{name:'下载 PNG',exact:true}).click(); const download=await downloadPromise; await download.saveAs('output/playwright/竹竹-first-photo.png');
+  await page.getByRole('button',{name:'保存到相册',exact:true}).click();
+  await page.waitForFunction(()=>document.querySelector('#wood-photo-save').textContent==='已保存');
+  await page.screenshot({path:'output/playwright/photo-preview-mobile.png'});
+  await page.getByRole('button',{name:'关闭照片',exact:true}).click();
+  await page.getByRole('button',{name:'退出相机',exact:true}).click();
+  await page.reload(); await page.waitForFunction(()=>window.helpaniWoodland?.state());
+  await page.getByRole('button',{name:'▧ 打开我的相册',exact:true}).click();
+  await page.locator('#wood-album-grid button').first().click();
+  await page.waitForFunction(()=>document.querySelector('#wood-photo-preview').complete);
+  const persistedHash=await page.evaluate(async()=>{const bytes=await (await fetch(document.querySelector('#wood-photo-preview').src)).arrayBuffer();return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(b=>b.toString(16).padStart(2,'0')).join('');});
+  check(hash===persistedHash,'reopened album differs from preview');
+  console.log('PHOTO PASS',{previewSHA256:hash,albumSHA256:persistedHash,size:await page.locator('#wood-photo-preview').evaluate(img=>({width:img.naturalWidth,height:img.naturalHeight}))});
+  await page.getByRole('button',{name:'关闭照片',exact:true}).click(); await page.getByRole('button',{name:'关闭相册',exact:true}).click();
+  return {previewSHA256:hash,albumSHA256:persistedHash,width:1600,height:1000,mobileWidth:390,reloadPreservedLayout:true};
+}

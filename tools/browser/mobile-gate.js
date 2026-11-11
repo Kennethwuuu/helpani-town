@@ -1,0 +1,56 @@
+// Run in a fresh isolated context with tools/browser/mobile-emulation.config.json.
+// System Chrome with mobile touch emulation; this does not test Safari or a physical phone.
+async (page) => {
+  const check=(value,message)=>{if(!value)throw new Error(message);};
+  const origin=page.url().split('/').slice(0,3).join('/');
+  const context=page.context();const cdp=await context.newCDPSession(page);
+  const touch=(type,points)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:points});
+  const point=(id,x,y)=>({id,x,y,radiusX:3,radiusY:3,force:1});
+  await page.goto(origin+'/',{waitUntil:'domcontentloaded'});
+  await page.getByRole('link',{name:'试玩平台布置 →',exact:true}).tap();
+  await page.waitForFunction(()=>window.helpaniWoodland?.state()&&!document.querySelector('#wood-placement').hidden);
+  const mobile=await page.evaluate(()=>({width:innerWidth,height:innerHeight,touchPoints:navigator.maxTouchPoints,coarse:matchMedia('(pointer:coarse)').matches,dpr:devicePixelRatio}));
+  check(mobile.touchPoints>0&&mobile.coarse,'Context is not touch-enabled mobile emulation');
+  await page.getByRole('button',{name:'林缘边 · 低台',exact:false}).tap();
+  await page.getByRole('button',{name:'确认布置',exact:true}).tap();
+  await page.waitForFunction(()=>helpaniWoodland.state().layout.platform==='edge');
+  await page.getByRole('button',{name:'◉ 打开相机',exact:true}).tap();
+  await page.locator('#wood-canvas').scrollIntoViewIfNeeded();
+  const box=await page.locator('#wood-canvas').boundingBox(),x=box.x+box.width/2,y=box.y+box.height/2;
+  const before=await page.evaluate(()=>helpaniWoodland.snapshot().camera);
+  await touch('touchStart',[point(0,x-30,y),point(1,x+30,y)]);
+  await touch('touchMove',[point(0,x-55,y),point(1,x+55,y)]);
+  await touch('touchEnd',[]);
+  const pinched=await page.evaluate(()=>helpaniWoodland.snapshot().camera);
+  check(pinched.zoom>before.zoom+.25,'Trusted two-finger touch did not zoom');
+  await touch('touchStart',[point(2,x,y)]);await touch('touchMove',[point(2,x-35,y)]);await touch('touchEnd',[]);
+  const panned=await page.evaluate(()=>helpaniWoodland.snapshot().camera);
+  check(Math.abs(panned.x-pinched.x)>10,'Trusted one-finger pan did not move camera');
+  await touch('touchStart',[point(3,x-25,y),point(4,x+25,y)]);await touch('touchCancel',[]);
+  await touch('touchStart',[point(5,x,y)]);await touch('touchMove',[point(5,x+30,y)]);await touch('touchEnd',[]);
+  const recovered=await page.evaluate(()=>helpaniWoodland.snapshot().camera);
+  check(Math.abs(recovered.x-panned.x)>10,'Touch cancel left gesture state stuck');
+  await page.getByRole('button',{name:'找找竹竹',exact:false}).tap();
+  await page.getByRole('button',{name:'拍下这一刻',exact:true}).tap();
+  await page.waitForFunction(()=>!document.querySelector('#wood-photo-save').disabled&&document.querySelector('#wood-photo-preview').complete);
+  const hash=()=>page.evaluate(async()=>{const data=await(await fetch(document.querySelector('#wood-photo-preview').src)).arrayBuffer();return [...new Uint8Array(await crypto.subtle.digest('SHA-256',data))].map(x=>x.toString(16).padStart(2,'0')).join('');});
+  const previewHash=await hash();
+  const imageSize=await page.locator('#wood-photo-preview').evaluate(img=>({width:img.naturalWidth,height:img.naturalHeight}));
+  check(imageSize.width===1600&&imageSize.height===1000,'Export resolution incorrect');
+  await page.getByRole('button',{name:'保存到相册',exact:true}).tap();await page.waitForFunction(()=>document.querySelector('#wood-photo-save').textContent==='已保存');
+  const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'下载 PNG',exact:true}).tap();const download=await downloadPromise;await download.saveAs('output/playwright/mobile-touch-export.png');
+  await page.screenshot({path:'output/playwright/mobile-touch-photo.png'});
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.helpaniWoodland?.state()?.layout.platform==='edge');
+  await page.getByRole('button',{name:'▧ 打开我的相册',exact:true}).tap();
+  await page.locator('#wood-album-grid button').first().tap();await page.waitForFunction(()=>document.querySelector('#wood-photo-preview').complete);
+  const reopenedHash=await hash();check(previewHash===reopenedHash,'Reloaded album changed photo');
+  await page.getByRole('button',{name:'关闭照片',exact:true}).tap();await page.getByRole('button',{name:'关闭相册',exact:true}).tap();
+  const newTab=await context.newPage();await newTab.goto(origin+'/woodland',{waitUntil:'domcontentloaded'});await newTab.waitForFunction(()=>window.helpaniWoodland?.state());
+  await newTab.getByRole('button',{name:'▧ 打开我的相册',exact:true}).tap();await newTab.locator('#wood-album-grid button').first().waitFor();
+  check(await newTab.locator('#wood-album-grid button').count()===1,'Same shutter saved multiple album items');
+  await newTab.close();await page.bringToFront();
+  check(await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth),'Mobile page overflows horizontally');
+  await page.locator('#wood-canvas').scrollIntoViewIfNeeded();await page.screenshot({path:'output/playwright/mobile-touch-woodland.png'});
+  await cdp.detach();
+  return {engine:'Chrome mobile/touch emulation, not Safari or a physical phone',mobile,trustedPinchZoom:pinched.zoom,trustedPan:panned.x-pinched.x,touchCancelRecovered:true,previewHash,reopenedHash,imageSize,newTabAlbumRestored:true,singleAlbumRecord:true,layoutReloadRestored:true};
+}

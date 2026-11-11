@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="440" viewBox="0 0 900 440">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1">
+      <stop stop-color="#374d46"/><stop offset="1" stop-color="#8e9970"/>
+    </linearGradient>
+    <pattern id="grain" width="24" height="17" patternUnits="userSpaceOnUse">
+      <path d="M3 4h1m13 4h1m-8 8h1m-5-4h1" stroke="#f9e2a7" stroke-width=".85" opacity=".55"/>
+    </pattern>
+    <g id="fern" fill="currentColor">
+      <path d="M0 0C0-41 10-70 31-92 16-68 9-35 3 0Z"/>
+      <path d="M6-20c-17-6-21-17-26-24 15 2 24 12 26 24Zm3-13c12-13 29-17 38-14-13 14-26 18-38 14Zm1-13c-12-5-15-17-17-25 12 6 16 14 17 25Zm6-14c11-11 24-12 33-9-10 11-22 13-33 9Zm5-10c-7-10-7-18-6-25 9 8 10 16 6 25Z"/>
+    </g>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h900v440H0z"/>
+  <circle cx="428" cy="128" r="90" fill="#cac691" opacity=".17"/>
+  <circle cx="428" cy="128" r="63" fill="#e2d69b" opacity=".23"/>
+  <circle cx="428" cy="128" r="43" fill="#e8d399"/>
+  <path d="M0 194c111-37 192-34 262 8 63 38 116 40 175 18 107-39 188-61 259-36 86 30 147 36 204 28v228H0Z" fill="#657b5d"/>
+  <path d="M0 246c87-12 143-20 216 9 57 22 110 39 172 22 78-20 136-32 236-17 126 19 190 9 276-17v197H0Z" fill="#576e54"/>
+  <path d="M0 326c83 6 146 15 229 1 125-20 208-2 304 12 96 13 207-25 367-20v121H0Z" fill="#8a8e63"/>
+  <path d="M0 384c117-12 189 26 326 19 107-6 191-39 293-38 110 2 189 24 281 13v62H0Z" fill="#a5a074"/>
+  <path d="M0 384c117-12 189 26 326 19 107-6 191-39 293-38 110 2 189 24 281 13v62H0Z" fill="url(#grain)"/>
+  <g color="#42634e">
+    <use href="#fern" transform="translate(152 357) rotate(-12) scale(1.15)"/><use href="#fern" transform="translate(126 358) rotate(15) scale(.86)"/>
+    <use href="#fern" transform="translate(787 376) rotate(18) scale(1.4)"/><use href="#fern" transform="translate(743 377) rotate(-13) scale(1.11)"/>
+  </g>
+  <g color="#557454">
+    <use href="#fern" transform="translate(60 438) rotate(-17) scale(1.35)"/><use href="#fern" transform="translate(98 436) rotate(12) scale(.8)"/>
+    <use href="#fern" transform="translate(844 440) rotate(-12) scale(1.05)"/>
+  </g>
+  <g fill="#f0dda3" opacity=".8"><circle cx="254" cy="220" r="2.4"/><circle cx="583" cy="184" r="2.2"/><circle cx="661" cy="241" r="2"/><circle cx="209" cy="262" r="2.7"/><circle cx="716" cy="190" r="2"/></g>
+  <ellipse cx="478" cy="358" rx="243" ry="22" fill="#536247" opacity=".58"/>
+  <g fill="#c9b98b"><ellipse cx="270" cy="377" rx="8" ry="2.5"/><ellipse cx="324" cy="391" rx="6" ry="2"/><ellipse cx="580" cy="375" rx="8" ry="2.5"/><ellipse cx="682" cy="398" rx="5" ry="2"/></g>
+  <path d="M0 0h900v440H0Z" fill="url(#grain)" opacity=".25"/>
+</svg>

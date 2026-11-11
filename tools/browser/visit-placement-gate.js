@@ -1,0 +1,32 @@
+async (page) => {
+  const check=(ok,message)=>{if(!ok)throw new Error(message);};
+  const origin=page.url().split('/').slice(0,3).join('/');
+  await page.goto(origin+'/');
+  await page.setViewportSize({width:1440,height:900});
+  const adopt=page.getByRole('button',{name:'绿海龟 潮汐湾',exact:true});
+  if(await adopt.isVisible())await adopt.click();
+  await page.waitForFunction(()=>document.querySelector('#pet-name').textContent==='阿潮');
+  const baseline=await page.evaluate(async()=>await(await fetch('/api/state')).json());
+  await page.getByRole('link',{name:'试玩平台布置 →',exact:true}).click();
+  await page.waitForFunction(()=>window.helpaniWoodland?.state()&&!document.querySelector('#wood-placement').hidden);
+  check(page.url().includes('/woodland'),'visit route not reached');
+  check(await page.locator('#playroom').isHidden(),'original care should not be mixed into visit scene');
+  await page.getByRole('button',{name:'树干旁 · 高枝',exact:false}).click();
+  const desktop=await page.locator('#wood-confirm').boundingBox(),canvas=await page.locator('#wood-canvas').boundingBox();
+  check(desktop.y>=0&&desktop.y+desktop.height<=900&&canvas.y>=0&&canvas.y+canvas.height<=900,'desktop placement not in view');
+  await page.screenshot({path:'output/playwright/visit-placement-desktop.png'});
+  await page.getByRole('button',{name:'确认布置',exact:true}).click();await page.waitForFunction(()=>helpaniWoodland.state().layout.platform==='trunk');
+  await page.reload();await page.waitForFunction(()=>window.helpaniWoodland?.state()?.layout.platform==='trunk');
+  await page.setViewportSize({width:390,height:844});
+  await page.getByRole('button',{name:'林缘边 · 低台',exact:false}).click();
+  const mobile=await page.locator('#wood-confirm').boundingBox(),mobileCanvas=await page.locator('#wood-canvas').boundingBox();
+  check(mobile.y>=0&&mobile.y+mobile.height<=780&&mobileCanvas.y>=0,'mobile placement controls obscured');
+  check(await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth),'mobile overflow');
+  await page.screenshot({path:'output/playwright/visit-placement-mobile.png'});
+  await page.getByRole('button',{name:'确认布置',exact:true}).click();await page.waitForFunction(()=>helpaniWoodland.state().layout.platform==='edge');
+  const final=await page.evaluate(async()=>({habitat:helpaniWoodland.state(),town:await(await fetch('/api/state')).json()}));
+  check(JSON.stringify(final.town)===JSON.stringify(baseline),'visiting changed original care state');
+  check(final.habitat.growth.length===1,'relocation duplicated construction growth');
+  await page.getByRole('link',{name:'← 返回我的伙伴',exact:true}).click();await page.waitForFunction(()=>document.querySelector('#pet-name').textContent==='阿潮');
+  return {originalPetPreserved:true,careAndWalletUnchanged:true,desktopPreviewAndConfirmVisible:true,mobilePreviewAndConfirmVisible:true,bothPositionsSaved:true,refreshRestoredLayout:true};
+}

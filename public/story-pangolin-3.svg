@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300">
+  <style>
+    .moonbeam { animation: moonbeam 4.4s ease-in-out 1; }
+    .leaves { animation: settle 3.2s ease-in-out 1; }
+    @keyframes moonbeam { 55% { opacity: .28; } }
+    @keyframes settle { 45% { transform: translate(4px, -2px); } }
+    @media (prefers-reduced-motion: reduce) { .moonbeam, .leaves { animation: none; } }
+  </style>
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#253c49"/><stop offset="1" stop-color="#6e8172"/></linearGradient>
+    <linearGradient id="light" x2="0" y2="1"><stop stop-color="#eae2bd"/><stop offset="1" stop-color="#eddb9a" stop-opacity=".28"/></linearGradient>
+    <pattern id="scales" width="36" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)">
+      <path d="M0 1h36c-3 12-11 19-18 22C11 20 3 13 0 1Zm-18-12h36C15 1 7 8 0 11c-7-3-15-10-18-22Zm36 0h36C51 1 43 8 36 11c-7-3-15-10-18-22Z" fill="#ae8d62" stroke="#614c3b" stroke-width="1.6"/>
+      <path d="M18 5v12M0-6v11M36-6V5" stroke="#dbc188" stroke-width="1.1" stroke-linecap="round"/>
+    </pattern>
+    <clipPath id="coil"><path d="M442 147c-16-35-60-56-105-48-45 8-75 42-79 80-5 47 27 81 76 86 52 5 91-25 91-60 0-24-12-42-36-47-23-5-40 7-47 25-5 13-1 26 10 34-17-3-28-17-28-34 0-23 20-45 48-50 26-5 48 2 70 14Z"/></clipPath>
+  </defs>
+  <path d="M0 0h720v300H0Z" fill="url(#sky)"/>
+  <circle cx="355" cy="63" r="57" fill="#d8d9aa" opacity=".13"/>
+  <circle cx="355" cy="63" r="40" fill="#d8d9aa" opacity=".17"/>
+  <circle cx="355" cy="63" r="28" fill="#ebdfa9"/>
+  <path d="M0 152c78-31 172-20 237-11 89 13 143-19 227-20 99-1 160 19 256 5v174H0Z" fill="#536e60"/>
+  <path d="M0 191c89-22 198-17 282-20 78-2 120-26 214-19 100 9 172 6 224-5v153H0Z" fill="#425e53"/>
+  <path d="M15 226 0 0h41l10 227Zm63-7L69 0h22l17 219Zm540-4L640 0h20l-17 217Zm54 8L686 0h34v12l-20 210Z" fill="#2f4c46"/>
+  <path d="M32 57 0 42V28l35 18Zm5 42 84-52 6 8-87 63ZM648 75l-68-38 6-8 62 29Zm46-31 26-27v12l-26 27Z" fill="#2f4c46"/>
+  <path d="M0 220c110-11 178 11 276 10 100-1 164-22 251-20 94 2 144 15 193 9v81H0Z" fill="#68775b"/>
+  <path class="moonbeam" d="M331 74h48l116 196c-56 13-199 18-272 3Z" fill="url(#light)" opacity=".19"/>
+  <ellipse cx="355" cy="268" rx="115" ry="14" fill="#485b49" opacity=".82"/>
+  <path d="M442 147c-16-35-60-56-105-48-45 8-75 42-79 80-5 47 27 81 76 86 52 5 91-25 91-60 0-24-12-42-36-47-23-5-40 7-47 25-5 13-1 26 10 34-17-3-28-17-28-34 0-23 20-45 48-50 26-5 48 2 70 14Z" fill="url(#scales)" stroke="#514737" stroke-width="4" stroke-linejoin="round"/>
+  <g clip-path="url(#coil)">
+    <path d="M256 216c42 39 81 48 118 28 36-20 47-53 35-90l36-4v116H253Z" fill="#795d49" opacity=".37"/>
+    <path d="M265 166c17-42 51-68 92-66 35 1 59 15 77 40" stroke="#dcc395" stroke-width="3" fill="none" opacity=".76"/>
+  </g>
+  <path d="M422 151c14 6 25 19 29 31 7 18-9 31-33 38-10 3-22 3-28-2 17-14 29-31 21-45-5-8-17-11-24-12 7-8 20-16 35-10Z" fill="#bda980" stroke="#584d3a" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M421 161c1-6 6-9 9-7 3 2 3 5 0 9m4 15q-5 6-11 3" fill="none" stroke="#67573f" stroke-width="2.3" stroke-linecap="round"/>
+  <path d="M391 218q6 3 16 0c-3 5-12 6-16 0Z" fill="#58483a"/>
+  <path d="M412 221c-14 11-39 17-51 13-10-3-7-10 1-13l11-7" fill="#9f865f" stroke="#604e3b" stroke-width="3" stroke-linecap="round"/>
+  <path d="m356 226-5 3m9-2-4 5" stroke="#d3bd95" stroke-width="1.7" stroke-linecap="round"/>
+  <path d="m498 249 27-6 16-15m-15 15 27 2" fill="none" stroke="#65533d" stroke-width="6" stroke-linecap="round"/>
+  <path d="m498 246 26-6 15-13" fill="none" stroke="#ac9469" stroke-width="1.5" stroke-linecap="round"/>
+  <g class="leaves" fill="#a68d61"><path d="M170 265q15-17 32-5-14 10-32 5ZM213 278q20-12 32 0-13 7-32 0ZM492 266q16-13 34-7-13 12-34 7ZM550 278q18-13 33-3-16 11-33 3Z"/></g>
+  <g fill="#ebd9a4" opacity=".72"><circle cx="146" cy="176" r="2.3"/><circle cx="193" cy="151" r="1.8"/><circle cx="508" cy="155" r="2"/><circle cx="557" cy="178" r="2.4"/></g>
+</svg>

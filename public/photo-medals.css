@@ -1,0 +1,12 @@
+.wood-photo-accent { margin:16px 0 10px; padding:12px; border:1px solid #d3d8bf; border-radius:12px; }
+.wood-photo-accent legend { padding:0 6px; font-size:13px; font-weight:650; color:#31563e; }
+#wood-photo-accents { display:flex; flex-wrap:wrap; gap:8px; }
+#wood-photo-accents button { display:flex; align-items:center; gap:6px; padding:6px 10px; min-height:52px; font-size:12px; text-align:left; }
+#wood-photo-accents button[aria-pressed="true"] { border-color:#42684a; background:#e5edd9; color:#254d36; }
+#wood-photo-accents img { display:block; object-fit:contain; flex-shrink:0; }
+#wood-photo-accent-note { font-size:11px; line-height:1.6; color:#66735b; margin:10px 0 0; }
+@media(max-width:650px) {
+  #wood-photo-accents { display:grid; grid-template-columns:1fr 1fr; }
+  #wood-photo-accents button { padding:7px; font-size:11px; }
+  #wood-photo-accents img { width:34px; height:34px; }
+}

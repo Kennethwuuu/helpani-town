@@ -1,0 +1,76 @@
+---
+title: Helpani Town 产品研发流程
+config:
+  theme: base
+  htmlLabels: false
+  themeVariables:
+    fontFamily: "PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif"
+    fontSize: "15px"
+    lineColor: "#566b60"
+    edgeLabelBackground: "#fffdf5"
+  flowchart:
+    nodeSpacing: 24
+    rankSpacing: 20
+    wrappingWidth: 225
+    curve: linear
+---
+flowchart TD
+    discover(["调研与定范围 · 玩家动机、机构流程、风险"])
+    design["设计 MVP · 用户故事、状态与验收口径"]
+    game["游戏开发 · 领养、照护、成长手记"]
+    organizer["公益运营 · 报名核验、积分与模拟赞助台账"]
+    integration["集成与交付准备 · 模型、沙箱支付、提交材料"]
+    demoTest["联调验收 · Astropods 实际生成、PayPal 沙箱付款"]
+    demoGate{"G1 参赛演示通过？"}
+    repair["修复失败路径并补测"]
+    submit["提交参赛 · 可运行演示、公开仓库、视频"]
+
+    partner["并行准备 · 确认合作机构、活动和数据授权"]
+    playtest["可选公开试玩 · 演示数据、留存和反馈"]
+    pilotGate{"G2 试点条件齐备？"}
+    holdPilot["维持演示，补齐合作与授权"]
+    pilotPrep["试点准备 · 账号权限、人工核验证据、审计"]
+    pilot["小范围试点与复盘 · 回访、到场核验、积分对账"]
+
+    fundControls["单地区资金准备 · 收款、退款、拨付和履约"]
+    fundGate{"G3 可开放真实资金？"}
+    holdFunds["暂缓开放资金，完善支付与运营条件"]
+    rollout["分批开放 · 对账、追踪物资和处理异常"]
+    monitor["监测与复盘 · 指标、反馈、下一轮优先级"]
+
+    discover --> design
+    design --> game & organizer & integration
+    design -. "并行" .-> partner
+    game & organizer & integration --> demoTest
+    demoTest --> demoGate
+    demoGate -->|"通过"| submit
+    demoGate -. "未通过" .-> repair
+    repair -. "复测" .-> demoTest
+
+    submit -. "演示经验" .-> pilotGate
+    submit -. "可选" .-> playtest
+    partner --> pilotGate
+    playtest -. "反馈" .-> pilotGate
+    pilotGate -->|"通过"| pilotPrep
+    pilotGate -. "条件不足" .-> holdPilot
+    holdPilot -. "补齐后复审" .-> pilotGate
+    pilotPrep --> pilot
+
+    pilot --> fundControls --> fundGate
+    fundGate -->|"通过"| rollout
+    fundGate -. "条件不足" .-> holdFunds
+    holdFunds -. "补齐后复审" .-> fundGate
+    rollout --> monitor
+    monitor -. "下一轮迭代" .-> design
+
+    classDef demo fill:#edf4e8,stroke:#6c8b70,color:#213c31
+    classDef pilotPhase fill:#eaf1f8,stroke:#6887a6,color:#233a51
+    classDef funds fill:#fbefd9,stroke:#9e773d,color:#513b21
+    classDef exception fill:#f7f4eb,stroke:#938775,stroke-dasharray:4 3,color:#51483c
+    classDef gate stroke-width:2px
+
+    class discover,design,game,organizer,integration,demoTest,demoGate,submit demo
+    class partner,playtest,pilotGate,pilotPrep,pilot pilotPhase
+    class fundControls,fundGate,rollout,monitor funds
+    class repair,holdPilot,holdFunds exception
+    class demoGate,pilotGate,fundGate gate

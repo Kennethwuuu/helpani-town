@@ -1,0 +1,767 @@
+{
+  "info": {
+    "name": "Helpani Town — Local and PayPal Sandbox checks",
+    "description": "Optional QA for Helpani Town. Import this collection and the blank Helpani Local + PayPal Sandbox environment. Run folders 1 and 2 against a local server with cookies enabled. Send folder 3 requests manually. The direct PayPal order is separate from the app checkout and no request targets live PayPal. Official PayPal Postman guide: https://developer.paypal.com/api/rest/postman/. Official API collection: https://www.postman.com/paypal/paypal-public-api-workspace/collection/ujhlb45/paypal-apis.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "item": [
+    {
+      "name": "1. Local payment guards (no PayPal calls)",
+      "description": "Run this folder in order against the local Helpani server. Keep Postman cookies enabled. The requests use invalid amounts or an impossible provider ID so they cannot start or capture an order, even if Sandbox is configured.",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const base = pm.variables.get('helpani_base_url') || '';",
+              "if (!/^http:\\/\\/(localhost|127\\.0\\.0\\.1)(:\\d{1,5})?$/.test(base)) {",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "Read wallet and payment state",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{helpani_base_url}}/api/state"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const snapshot = (state) => ({ points: state.points, budgetCents: state.budgetCents, allocatedCents: state.allocatedCents, payments: state.payments });",
+                  "pm.test('Wallet and payment records are present', () => {",
+                  "  const state = pm.response.json();",
+                  "  pm.expect(state.points).to.be.a('number');",
+                  "  pm.expect(state.budgetCents).to.be.a('number');",
+                  "  pm.expect(state.allocatedCents).to.be.a('number');",
+                  "  pm.expect(state.payments).to.be.an('array');",
+                  "  pm.collectionVariables.set('helpani_wallet_snapshot', JSON.stringify(snapshot(state)));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject tampered donation amount",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{helpani_base_url}}/api/paypal/order",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kind\": \"donation\",\n  \"amountCents\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject tampered supply amount",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{helpani_base_url}}/api/paypal/order",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kind\": \"supply\",\n  \"amountCents\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject an unknown approval callback",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{helpani_base_url}}/api/paypal/return?token=__postman_unknown_order__"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 303', () => pm.response.to.have.status(303));",
+                  "pm.test('The unknown order cannot reach capture', () => {",
+                  "  pm.expect(pm.response.headers.get('Location')).to.eql('/support?payment=error#records');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          }
+        },
+        {
+          "name": "Confirm wallet and payment records are unchanged",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{helpani_base_url}}/api/state"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const snapshot = (state) => ({ points: state.points, budgetCents: state.budgetCents, allocatedCents: state.allocatedCents, payments: state.payments });",
+                  "pm.test('Amounts, civic points, and payment records are unchanged', () => {",
+                  "  const before = pm.collectionVariables.get('helpani_wallet_snapshot');",
+                  "  pm.expect(Boolean(before), 'Run Read wallet and payment state first').to.eql(true);",
+                  "  pm.expect(snapshot(pm.response.json())).to.eql(JSON.parse(before));",
+                  "  pm.collectionVariables.unset('helpani_wallet_snapshot');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Local organizer simulation (no PayPal calls)",
+      "description": "Run this folder in order with the same Postman cookie jar and local base URL. This creates a simulated registration for the wetland cleanup in the current demo session. A fresh Postman cookie gives the full first-time flow. To repeat against the same session, signup and organizer verification preserve existing points.",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const base = pm.variables.get('helpani_base_url') || '';",
+              "if (!/^http:\\/\\/(localhost|127\\.0\\.0\\.1)(:\\d{1,5})?$/.test(base)) {",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "Read current activity status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{helpani_base_url}}/api/state"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('The demo activity exists', () => {",
+                  "  const state = pm.response.json();",
+                  "  const status = state.activities['park-cleanup'];",
+                  "  pm.expect(['open', 'signed_up', 'verified']).to.include(status);",
+                  "  pm.collectionVariables.set('helpani_activity_before', status);",
+                  "  pm.collectionVariables.set('helpani_points_before', state.points);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject organizer verification before signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{helpani_base_url}}/api/organizer/verify",
+            "description": "This guard runs only if the current session has not signed up.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"park-cleanup\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.collectionVariables.get('helpani_activity_before') !== 'open') {",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sign up for the wetland cleanup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{helpani_base_url}}/api/activity/signup",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"park-cleanup\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Signup alone does not grant civic points', () => {",
+                  "  const state = pm.response.json();",
+                  "  const before = pm.collectionVariables.get('helpani_activity_before');",
+                  "  pm.expect(state.activities['park-cleanup']).to.eql(before === 'verified' ? 'verified' : 'signed_up');",
+                  "  pm.expect(state.points).to.eql(Number(pm.collectionVariables.get('helpani_points_before')));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read organizer registrations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{helpani_base_url}}/api/organizer/registrations"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('The signup is visible in the organizer list', () => {",
+                  "  const state = pm.response.json();",
+                  "  const registration = state.registrations.find(({ id }) => id === 'park-cleanup');",
+                  "  pm.expect(registration, 'Wetland cleanup registration').to.be.an('object');",
+                  "  pm.expect(registration.points).to.eql(100);",
+                  "  pm.expect(state.points).to.eql(Number(pm.collectionVariables.get('helpani_points_before')));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify from the simulated organizer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{helpani_base_url}}/api/organizer/verify",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"park-cleanup\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('The organizer awards the activity points once', () => {",
+                  "  const state = pm.response.json();",
+                  "  const registration = state.registrations.find(({ id }) => id === 'park-cleanup');",
+                  "  pm.expect(registration.status).to.eql('verified');",
+                  "  const alreadyVerified = pm.collectionVariables.get('helpani_activity_before') === 'verified';",
+                  "  const before = Number(pm.collectionVariables.get('helpani_points_before'));",
+                  "  pm.expect(state.points).to.eql(before + (alreadyVerified ? 0 : 100));",
+                  "  pm.collectionVariables.set('helpani_verified_points', state.points);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Retry organizer verification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{helpani_base_url}}/api/organizer/verify",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"park-cleanup\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Retry does not grant a second award', () => {",
+                  "  const state = pm.response.json();",
+                  "  pm.expect(state.points).to.eql(Number(pm.collectionVariables.get('helpani_verified_points')));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Confirm the player sees the verified activity",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{helpani_base_url}}/api/state"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Player and organizer balances match', () => {",
+                  "  const state = pm.response.json();",
+                  "  pm.expect(state.activities['park-cleanup']).to.eql('verified');",
+                  "  pm.expect(state.points).to.eql(Number(pm.collectionVariables.get('helpani_verified_points')));",
+                  "  for (const key of ['helpani_activity_before', 'helpani_points_before', 'helpani_verified_points']) {",
+                  "    pm.collectionVariables.unset(key);",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. PayPal Sandbox (send each request manually)",
+      "description": "This folder tests PayPal directly using a standalone test order. It never updates the Helpani payment ledger. Use a private Postman environment and Sandbox credentials only. Set paypal_sandbox_enabled to true in your local values. Send OAuth and Create order one at a time. Use the saved approval URL from the Create response in a browser and sign in as a Sandbox personal buyer. Then send Check buyer approval. After checking that the status is APPROVED, copy the current order ID into the local paypal_sandbox_capture_confirmation value and manually send Capture. Clear credentials and derived local values when done and do not share a populated environment export. Never reuse an app checkout order ID for this folder.",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.environment.get('paypal_sandbox_enabled') !== 'true') {",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "1. OAuth using Sandbox app credentials",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "https://api-m.sandbox.paypal.com/v1/oauth2/token",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{paypal_sandbox_client_id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{paypal_sandbox_client_secret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('paypal_sandbox_access_token', '');",
+                  "for (const key of [\"paypal_sandbox_order_id\",\"paypal_sandbox_reference\",\"paypal_sandbox_approval_url\",\"paypal_sandbox_approved_order_id\",\"paypal_sandbox_capture_request_id\",\"paypal_sandbox_capture_confirmation\"]) pm.environment.set(key, '');",
+                  "if (!pm.variables.get('paypal_sandbox_client_id') || !pm.variables.get('paypal_sandbox_client_secret')) {",
+                  "  pm.execution.skipRequest();",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Sandbox returns a bearer token', () => {",
+                  "  const auth = pm.response.json();",
+                  "  pm.expect(auth.token_type).to.eql('Bearer');",
+                  "  pm.expect(typeof auth.access_token === 'string' && auth.access_token.length > 0).to.eql(true);",
+                  "  if (pm.response.code === 200) pm.environment.set('paypal_sandbox_access_token', auth.access_token);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Create a US$1 Sandbox order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              },
+              {
+                "key": "PayPal-Request-Id",
+                "value": "{{paypal_sandbox_reference}}"
+              }
+            ],
+            "url": "https://api-m.sandbox.paypal.com/v2/checkout/orders",
+            "description": "Approve only the Sandbox payer-action or approve URL in a browser. The URLs below return to the Helpani homepage and never call the app capture endpoint. This request stops Collection Runner before the browser step.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"intent\": \"CAPTURE\",\n  \"purchase_units\": [\n    {\n      \"reference_id\": \"{{paypal_sandbox_reference}}\",\n      \"description\": \"Helpani Town standalone Sandbox test\",\n      \"amount\": {\n        \"currency_code\": \"USD\",\n        \"value\": \"1.00\"\n      }\n    }\n  ],\n  \"payment_source\": {\n    \"paypal\": {\n      \"experience_context\": {\n        \"user_action\": \"PAY_NOW\",\n        \"shipping_preference\": \"NO_SHIPPING\",\n        \"return_url\": \"{{helpani_base_url}}/?postman-sandbox=approved\",\n        \"cancel_url\": \"{{helpani_base_url}}/?postman-sandbox=cancelled\"\n      }\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paypal_sandbox_access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const base = pm.variables.get('helpani_base_url') || '';",
+                  "if (!/^http:\\/\\/(localhost|127\\.0\\.0\\.1)(:\\d{1,5})?$/.test(base)) {",
+                  "  pm.execution.skipRequest();",
+                  "}",
+                  "const accessToken = pm.environment.get('paypal_sandbox_access_token');",
+                  "if (!accessToken) {",
+                  "  pm.execution.skipRequest();",
+                  "}",
+                  "for (const key of [\"paypal_sandbox_order_id\",\"paypal_sandbox_reference\",\"paypal_sandbox_approval_url\",\"paypal_sandbox_approved_order_id\",\"paypal_sandbox_capture_request_id\",\"paypal_sandbox_capture_confirmation\"]) pm.environment.set(key, '');",
+                  "const reference = pm.variables.replaceIn('{{$guid}}');",
+                  "pm.environment.set('paypal_sandbox_reference', reference);",
+                  "pm.variables.set('paypal_sandbox_reference', reference);",
+                  "pm.variables.set('paypal_sandbox_access_token', accessToken);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.execution.setNextRequest(null);",
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "pm.test('PayPal returns a new Sandbox approval link', () => {",
+                  "  const order = pm.response.json();",
+                  "  const link = order.links?.find(({ rel }) => rel === 'payer-action' || rel === 'approve');",
+                  "  pm.expect(/^[A-Z0-9]{1,36}$/.test(order.id || '')).to.eql(true);",
+                  "  pm.expect(/^https:\\/\\/(www\\.)?sandbox\\.paypal\\.com\\//.test(link?.href || '')).to.eql(true);",
+                  "  if (pm.response.code !== 201) return;",
+                  "  pm.environment.set('paypal_sandbox_order_id', order.id);",
+                  "  pm.environment.set('paypal_sandbox_approval_url', link.href);",
+                  "  pm.environment.set('paypal_sandbox_capture_request_id', pm.variables.replaceIn('{{$guid}}'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          }
+        },
+        {
+          "name": "3. Check buyer approval after the browser step",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "https://api-m.sandbox.paypal.com/v2/checkout/orders/{{paypal_sandbox_order_id}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paypal_sandbox_access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const orderId = pm.environment.get('paypal_sandbox_order_id') || '';",
+                  "const accessToken = pm.environment.get('paypal_sandbox_access_token') || '';",
+                  "pm.environment.set('paypal_sandbox_approved_order_id', '');",
+                  "pm.environment.set('paypal_sandbox_capture_confirmation', '');",
+                  "if (!accessToken || !/^[A-Z0-9]{1,36}$/.test(orderId)) {",
+                  "  pm.execution.skipRequest();",
+                  "}",
+                  "pm.variables.set('paypal_sandbox_order_id', orderId);",
+                  "pm.variables.set('paypal_sandbox_access_token', accessToken);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('The expected US$1 order has buyer approval', () => {",
+                  "  const order = pm.response.json();",
+                  "  const unit = order.purchase_units?.[0];",
+                  "pm.expect(order.id).to.eql(pm.environment.get('paypal_sandbox_order_id'));",
+                  "pm.expect(unit?.reference_id).to.eql(pm.environment.get('paypal_sandbox_reference'));",
+                  "pm.expect(order.purchase_units).to.have.lengthOf(1);",
+                  "  pm.expect(unit.amount).to.include({ currency_code: 'USD', value: '1.00' });",
+                  "  pm.expect(order.status, 'Approve the order in the Sandbox browser first').to.eql('APPROVED');",
+                  "  if (pm.response.code === 200) pm.environment.set('paypal_sandbox_approved_order_id', order.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          }
+        },
+        {
+          "name": "4. Capture manually after confirming the exact order ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              },
+              {
+                "key": "PayPal-Request-Id",
+                "value": "{{paypal_sandbox_capture_request_id}}"
+              }
+            ],
+            "url": "https://api-m.sandbox.paypal.com/v2/checkout/orders/{{paypal_sandbox_order_id}}/capture",
+            "description": "Send only after the preceding GET confirmed APPROVED. Enter the exact same order ID as the local paypal_sandbox_capture_confirmation value. Use the same stored PayPal-Request-Id if retrying a transport failure.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paypal_sandbox_access_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const orderId = pm.environment.get('paypal_sandbox_order_id') || '';",
+                  "const accessToken = pm.environment.get('paypal_sandbox_access_token') || '';",
+                  "const approval = pm.environment.get('paypal_sandbox_approved_order_id');",
+                  "const confirmation = pm.environment.get('paypal_sandbox_capture_confirmation');",
+                  "const requestId = pm.environment.get('paypal_sandbox_capture_request_id');",
+                  "if (!accessToken || !/^[A-Z0-9]{1,36}$/.test(orderId)",
+                  "  || approval !== orderId || confirmation !== orderId || !requestId) {",
+                  "  pm.execution.skipRequest();",
+                  "}",
+                  "pm.variables.set('paypal_sandbox_order_id', orderId);",
+                  "pm.variables.set('paypal_sandbox_access_token', accessToken);",
+                  "pm.variables.set('paypal_sandbox_capture_request_id', requestId);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Capture request succeeded', () => {",
+                  "  pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});",
+                  "pm.test('The expected US$1 Sandbox capture is completed', () => {",
+                  "  const order = pm.response.json();",
+                  "  const unit = order.purchase_units?.[0];",
+                  "pm.expect(order.id).to.eql(pm.environment.get('paypal_sandbox_order_id'));",
+                  "pm.expect(unit?.reference_id).to.eql(pm.environment.get('paypal_sandbox_reference'));",
+                  "pm.expect(order.purchase_units).to.have.lengthOf(1);",
+                  "  const captures = unit.payments?.captures;",
+                  "  pm.expect(captures).to.have.lengthOf(1);",
+                  "  const capture = captures[0];",
+                  "  pm.expect(typeof capture.id === 'string' && capture.id.length > 0).to.eql(true);",
+                  "  pm.expect(capture.amount).to.include({ currency_code: 'USD', value: '1.00' });",
+                  "  pm.expect(order.status).to.eql('COMPLETED');",
+                  "  pm.expect(capture.status).to.eql('COMPLETED');",
+                  "});",
+                  "pm.environment.set('paypal_sandbox_capture_confirmation', '');"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          }
+        }
+      ]
+    }
+  ]
+}

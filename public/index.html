@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <script>
+    // File previews have no HTTP origin or game API. Use the npm start entrypoint.
+    if (location.protocol === 'file:') {
+      location.replace('http://localhost:3000/' + location.search + location.hash);
+    }
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f4ea">
+  <meta name="description" content="Helpani Town 动物救助小镇公益游戏演示">
+  <title>动物救助小镇 · Helpani Town</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css?v=20261110-unified-care">
+  <link rel="stylesheet" href="/woodland.css?v=20261110-unified-care">
+  <link rel="stylesheet" href="/patrol-rewards.css?v=20261109-medal-rewards">
+  <link rel="stylesheet" href="/photo-medals.css?v=20261109-medal-rewards">
+  <script defer src="/pet-stories.js"></script>
+  <script defer src="/app.js?v=20261110-unified-care"></script>
+  <script type="module" src="/woodland.js?v=20261111-species-patrol"></script>
+</head>
+<body>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-medal" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5"/><path d="m8.5 13.5-2 7 5.5-2.2 5.5 2.2-2-7M12 7v4m-2-2h4"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c2-5 6-8 10-10M7 16C1 8 11 3 20 4c0 9-6 16-13 12Z"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 21v-7h6v7"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1Zm0 0v14"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-3-2-4 2-4-2-3 2V4a1 1 0 0 1 1-1Z"/><path d="M9 8h6m-6 4h6"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2c0 6 4 10 10 10-6 0-10 4-10 10 0-6-4-10-10-10 6 0 10-4 10-10Z"/></symbol>
+    <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10m-3-7h4a1.5 1.5 0 0 1 0 3h-2a1.5 1.5 0 0 0 0 3h4"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="M12 22 3 17V7l9-5 9 5v10l-9 5Zm0 0V12m9-5-9 5-9-5m5-2 9 5"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2m18 0v-2a4 4 0 0 0-3-4m-1-11a4 4 0 0 1 0 8"/><circle cx="9.5" cy="8" r="4"/></symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6m-5 0v7l-6 9a1 1 0 0 0 1 2h14a1 1 0 0 0 1-2l-6-9V3M8 14h8"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11s-7-6-7-11a7 7 0 0 1 14 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 21 4 13a5 5 0 0 1 7-7l1 1 1-1a5 5 0 0 1 7 7Z"/></symbol>
+    <symbol id="i-bowl" viewBox="0 0 24 24"><path d="M3 12h18a9 9 0 0 1-18 0Zm3 9h12m-7-18 1 2m-5 1 1 2m8 0 2-2"/></symbol>
+    <symbol id="i-dice" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 8h.01m8 0h.01m-4 4h.01m-4 4h.01m8 0h.01" stroke-width="3"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4m8-4v4"/></symbol>
+    <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2 8c3 0 3-3 6-3s3 3 6 3 3-3 6-3h2M2 14c3 0 3-3 6-3s3 3 6 3 3-3 6-3h2M2 20c3 0 3-3 6-3s3 3 6 3 3-3 6-3h2"/></symbol>
+  </svg>
+
+  <a class="skip" href="#main">跳至主要内容</a>
+  <header class="header">
+    <div class="shell header-inner">
+      <a class="brand" href="/" aria-label="动物救助小镇首页">
+        <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-leaf"/></svg></span>
+        <span>动物救助小镇<small>HELPANI TOWN</small></span>
+      </a>
+      <nav class="primary-nav" aria-label="主要导航">
+        <a data-route="town" href="/"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg>小镇</a>
+        <a data-route="stories" href="/stories"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>故事</a>
+        <a data-route="activities" href="/activities"><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg>活动</a>
+        <a data-route="support" href="/support"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>支持</a>
+      </nav>
+      <span class="demo-pill"><span></span>演示模式</span>
+    </div>
+  </header>
+
+  <main class="shell" id="main">
+    <div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div>
+    <noscript><p class="notice">请启用 JavaScript 以打开小镇演示。</p></noscript>
+
+    <div class="route-page" data-page="town" hidden>
+      <div class="intro" id="town">
+        <div>
+          <p class="eyebrow"><span>01</span> 小镇日记 · 潮汐湾</p>
+          <h1>欢迎来到小镇<span>。</span></h1>
+          <p class="intro-description">领养一只虚拟伙伴，慢慢照料它。也可以报名附近的<a href="/activities">湿地净滩或防鸟撞工作坊</a>（上海演示）。<a class="daily-jump" href="#daily-care">查看今日守护</a></p>
+        </div>
+        <dl class="wallet" aria-label="小镇钱包">
+          <div class="wallet-food"><dt><span class="wallet-icon xp-icon"><svg class="icon" aria-hidden="true"><use href="#i-bowl"/></svg></span>照护粮</dt><dd><span id="food">—</span><small>虚拟喂养 · 小镇内使用</small></dd></div>
+          <div class="wallet-impact"><dt><span class="wallet-icon points-icon"><svg class="icon" aria-hidden="true"><use href="#i-leaf"/></svg></span>公益积分</dt><dd><span id="points">—</span><small>模拟活动 · 支持演示项目</small></dd></div>
+        </dl>
+      </div>
+      <div class="notice"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg><p>黑客松原型 · 领养仅发生在游戏内。机构、活动、预算和救助进展为虚构样例。PayPal 仅使用沙箱。</p></div>
+      <section class="card first-steps" id="first-steps" aria-labelledby="first-steps-heading" hidden>
+        <div class="onboarding-heading"><p class="eyebrow">初次见面</p><h2 id="first-steps-heading">和伙伴认识一下</h2></div>
+        <ol class="onboarding-steps" aria-label="第一次照护">
+          <li id="onboarding-adopt" class="is-current"><span class="onboarding-number" aria-hidden="true">1</span><span>领养伙伴</span></li>
+          <li id="onboarding-interact"><span class="onboarding-number" aria-hidden="true">2</span><span>打个招呼</span></li>
+          <li id="onboarding-feed"><span class="onboarding-number" aria-hidden="true">3</span><span>首次喂食</span></li>
+        </ol>
+        <div class="onboarding-action-row">
+          <p id="onboarding-copy">选一只伙伴，和它打个招呼，再送出第一份虚拟照护粮。</p>
+          <button class="button primary" id="onboarding-action" type="button" disabled>迎接伙伴</button>
+        </div>
+      </section>
+      <section id="woodland" hidden aria-label="竹竹的林地生活"></section>
+      <section class="card playroom" id="playroom" aria-label="虚拟动物领养和照料">
+        <div class="play-scene">
+          <div class="landscape">
+            <div class="scene-artboard">
+              <img id="pet-image" src="/tidepool-habitat.svg?v=20261110-unified-care" alt="等待伙伴入住的虚拟栖地" width="900" height="393">
+              <img id="pangolin-den" class="pangolin-den" src="/pangolin-den.svg" alt="" hidden>
+              <img id="pet-sprite" class="pet-sprite" alt="" hidden>
+              <span class="scene-dirt" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+              <button type="button" id="pet-touch" class="pet-touch" aria-label="和伙伴打招呼" hidden><span class="pet-touch-hint">打个招呼</span></button>
+              <span class="scene-greeting-heart" aria-hidden="true"><svg class="icon"><use href="#i-heart"/></svg></span>
+              <div class="scene-feed-effect" aria-hidden="true">
+                <svg class="scene-snack" width="25" height="25" viewBox="0 0 24 24">
+                  <path d="M18.6 4.9c3 2.5 3.7 7.3.9 10.3-2.1 2.3-5.3 2.9-8.4 3.6-2.8.7-5.9.2-7.3-2.4-1.7-3.2.6-6.6 3.3-8.6 3.5-2.6 8-5.5 11.5-2.9Z" fill="#f3bd5b" stroke="#6e4a26" stroke-width="1.5"/>
+                  <path d="m9 13 1.2-1.1m3.5 2.3 1-.8m.1-4.2.8-.7" fill="none" stroke="#956633" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span class="scene-sparks"><span></span><span></span><span></span><span></span></span>
+                <span class="scene-xp">+10 XP</span>
+              </div>
+            </div>
+            <div id="pet-scene-loading" class="pet-scene-loading" role="status" hidden><span id="pet-scene-loading-copy"></span><button id="pet-scene-retry" class="button secondary" type="button" hidden>重试加载栖地</button></div>
+            <div class="pet-arrival" id="pet-arrival" aria-hidden="true" hidden><span>新伙伴来到小镇</span><strong id="pet-arrival-name"></strong></div>
+            <span class="scene-dawn" aria-hidden="true"></span>
+            <span class="scene-label"><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg> 虚拟栖息地</span>
+            <span class="scene-index">HELPANI FIELD NOTES <span>01</span></span>
+            <p class="pet-behavior-status" id="pet-behavior-status"></p>
+            <p class="scene-touch-notice" id="scene-touch-notice" role="status"></p>
+            <button type="button" class="scene-feed-handle" id="scene-feed" aria-label="拖动照护粮或点击喂食" disabled hidden><svg class="icon" aria-hidden="true"><use href="#i-bowl"/></svg><span id="scene-feed-label">拖粮喂食</span><small id="scene-feed-count"></small></button>
+            <span class="scene-drag-snack" id="scene-drag-snack" aria-hidden="true" hidden><svg class="icon"><use href="#i-bowl"/></svg></span>
+          </div>
+          <div class="scene-note">
+            <span class="scene-note-icon"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span>
+            <div><strong>给陪伴留一点余地</strong><p>随时回来看看。错过一天，伙伴也会安心休息。</p></div>
+            <button class="pet-autonomy-toggle" id="pet-autonomy-toggle" type="button" aria-pressed="false" hidden>暂停活动</button>
+          </div>
+        </div>
+        <div class="play-side">
+          <section id="adoption-panel" aria-labelledby="adopt-heading">
+            <p class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-spark"/></svg> 第一步 · 迎接伙伴</p>
+            <h2 id="adopt-heading" tabindex="-1">今天谁来住进小镇？</h2>
+            <p class="panel-description">选一只想认识的伙伴，开启自己的照料日记。</p>
+            <div class="animal-options" aria-label="选择虚拟领养动物">
+              <button class="animal-option" type="button" data-adopt="sea-turtle" disabled>
+                <span class="animal-thumb turtle-thumb"><img src="/tidepool.svg" alt="" width="900" height="393"></span><strong>绿海龟</strong><small>潮汐湾</small>
+              </button>
+              <button class="animal-option" type="button" data-adopt="red-panda" disabled>
+                <span class="animal-thumb panda-thumb"><img src="/red-panda.svg" alt="" width="900" height="440"></span><strong>小熊猫</strong><small>竹影林</small>
+              </button>
+              <button class="animal-option" type="button" data-adopt="pangolin" disabled>
+                <span class="animal-thumb pangolin-thumb"><img src="/pangolin.svg" alt="" width="900" height="440"></span><strong>中华穿山甲</strong><small>蕨叶谷</small>
+              </button>
+            </div>
+            <button class="button primary random-adopt" type="button" data-adopt="random" disabled><svg class="icon" aria-hidden="true"><use href="#i-dice"/></svg> 随机遇见一只 <svg class="icon random-arrow" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            <button class="button secondary cancel-adoption" id="cancel-adoption" type="button" hidden>返回当前伙伴</button>
+          </section>
+
+          <section id="care-panel" aria-labelledby="pet-name" hidden>
+            <p class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-spark"/></svg> 伙伴日记 · 虚拟照料</p>
+            <div class="creature">
+              <div><h2 id="pet-name" tabindex="-1">小镇伙伴</h2><p class="pet-species" id="pet-species">—</p></div>
+              <span id="pet-stage" class="tag tag-green">—</span>
+            </div>
+            <p class="pet-message" id="pet-message">伙伴在这里等你。</p>
+            <div class="growth-row"><label for="pet-progress">成长手记进度</label><strong><span id="xp">—</span> XP</strong></div>
+            <progress id="pet-progress" value="0" max="100" aria-describedby="pet-progress-copy"></progress>
+            <p id="pet-progress-copy" class="progress-copy"></p>
+            <div class="care-actions">
+              <button class="button secondary" id="check-in" type="button" disabled><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg> 今日签到</button>
+              <button class="button primary" id="feed" type="button" disabled><svg class="icon" aria-hidden="true"><use href="#i-bowl"/></svg> 喂食伙伴</button>
+            </div>
+            <p class="pet-action-feedback" id="pet-action-feedback" role="status">每天最多照护 2 次。</p>
+            <p id="pet-next" class="next-note"></p>
+            <a class="story-link" id="story-jump" href="/stories#story-summary" hidden>打开伙伴故事</a>
+            <section class="letter-reward" id="letter-reward" aria-labelledby="letter-reward-title" hidden>
+              <div class="letter-reward-body">
+                <p class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg> 小镇来信 · 虚拟</p>
+                <h3 id="letter-reward-title" tabindex="-1">一封新来信已解锁</h3>
+                <p id="letter-reward-copy">来信会保存在故事页，随时可以回看。</p>
+                <a class="story-link" id="letter-reward-link" href="/stories#story-summary">打开这封来信</a>
+              </div>
+              <button class="letter-reward-dismiss" id="letter-reward-dismiss" type="button">收起提示</button>
+            </section>
+            <div class="demo-day">
+              <div><p class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg> 小镇日期 · 演示</p><p class="demo-date" id="demo-date">—</p></div>
+              <button class="button secondary" id="demo-next-day" type="button" disabled>切到次日（演示）</button>
+              <p class="demo-day-notice" id="demo-day-notice" role="status" hidden></p>
+              <a class="demo-day-story" id="demo-day-story" href="/stories#story-summary" hidden>读已解锁的来信</a>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="card daily-care" id="daily-care" aria-labelledby="daily-heading">
+        <div class="daily-heading">
+          <span class="daily-mark"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span>
+          <div><p class="eyebrow">小镇日记 · 每日回访</p><h2 id="daily-heading">今日守护</h2></div>
+        </div>
+        <div class="daily-grid">
+          <div class="daily-panel daily-letter">
+            <div class="daily-label">
+              <p class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg> 小镇来信 · 虚拟</p>
+              <p class="daily-state" id="daily-letter-status">尚未领养</p>
+            </div>
+            <h3 id="daily-letter-title">给未来伙伴的第一封信</h3>
+            <p id="daily-letter-copy">领养一只小镇伙伴，照护时可以解锁它的成长手记。</p>
+            <a class="daily-link" id="daily-letter-link" href="#adopt-heading">去迎接伙伴</a>
+          </div>
+          <div class="daily-panel daily-project">
+            <p class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-wave"/></svg> 项目进展 · 演示</p>
+            <h3 id="daily-project-update">救助站简报</h3>
+            <p class="daily-meta" id="daily-project-meta"></p>
+            <p id="daily-project-status"></p>
+            <a class="daily-link" href="/support#project-update">查看海龟夜间观察站记录</a>
+          </div>
+        </div>
+        <div class="daily-next">
+          <p><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg> 附近下一步 · 演示</p>
+          <a class="daily-link" id="daily-activity-link" href="/activities">查看附近演示活动</a>
+        </div>
+      </section>
+    </div>
+
+    <div class="route-page" data-page="stories" hidden>
+      <div class="route-heading">
+        <p class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg> 小镇来信 · 虚拟</p>
+        <h1 id="stories-heading">伙伴故事<span>。</span></h1>
+        <p class="section-description">读伙伴的成长故事和野外笔记，也可以回看收藏在勋章册里的旧来信。</p>
+      </div>
+      <section class="card route-empty" id="stories-empty" aria-labelledby="stories-empty-heading" hidden>
+        <h2 id="stories-empty-heading">还没有伙伴的故事</h2>
+        <p>先到小镇领养一只虚拟伙伴，再通过照护解锁它的故事。</p>
+        <a class="button primary" href="/#adopt-heading">去小镇迎接伙伴</a>
+      </section>
+
+      <details id="story" class="card story story-book" hidden>
+        <summary id="story-summary"><span class="story-icon"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></span><span id="story-title">伙伴的四章故事</span><span class="tag tag-green" id="story-status">0 / 4 章</span></summary>
+        <p class="story-intro">每章有一封虚拟来信和一则野外笔记。照护伙伴，继续解锁后面的故事。</p>
+        <ol class="chapter-list" id="story-copy"></ol>
+        <div class="medal-celebration" id="medal-celebration" hidden>
+          <span class="medal-award-icon" aria-hidden="true"><svg class="icon"><use href="#i-medal"/></svg></span>
+          <div><p class="eyebrow">故事纪念 · 虚拟勋章</p><strong id="medal-celebration-name"></strong></div>
+        </div>
+        <div class="story-completion" id="completion-panel" hidden>
+          <span class="story-icon medal-icon"><svg class="icon" aria-hidden="true"><use href="#i-medal"/></svg></span>
+          <div><h3 id="completion-title" tabindex="-1">故事终章</h3><p id="completion-copy"></p></div>
+          <div class="completion-actions">
+            <button class="button primary" id="claim-medal" type="button" disabled>读完故事，领取保护勋章</button>
+            <a class="button primary" id="next-adoption-link" href="/?choose=next#adopt-heading" hidden>领养下一只伙伴</a>
+            <a class="story-link" id="archive-jump" href="#town-archive" hidden>打开守护勋章册</a>
+          </div>
+          <p class="story-notice" id="medal-notice" role="status" hidden></p>
+        </div>
+      </details>
+
+      <section class="card town-archive" id="town-archive" aria-labelledby="archive-heading" hidden>
+        <div class="archive-header">
+          <span class="story-icon medal-icon"><svg class="icon" aria-hidden="true"><use href="#i-medal"/></svg></span>
+          <div><p class="eyebrow">故事纪念 · 虚拟勋章</p><h2 id="archive-heading">守护勋章册</h2></div>
+          <span id="medal-count" class="tag tag-yellow"></span>
+        </div>
+        <div id="archive-list" class="archive-list"></div>
+      </section>
+    </div>
+
+    <div class="route-page" data-page="activities" hidden>
+      <section class="activity-section" id="activities" aria-labelledby="activity-heading">
+        <div class="section-heading route-heading">
+          <div><p class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg> 小镇之外 · 上海样例</p><h1 id="activity-heading">野生动物友好行动<span>。</span></h1></div>
+          <div class="route-heading-aside">
+            <span class="location-pill"><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg> 上海 · 演示城市</span>
+            <span class="route-balance">公益积分 <strong id="activity-points">—</strong></span>
+          </div>
+        </div>
+        <p class="section-description">模拟报名后，前往<a href="/organizer">组织方演示台</a>确认出席，公益积分才会到账。活动均为虚构样例。</p>
+        <p id="activity-notice" class="activity-notice" role="status" hidden></p>
+        <div id="activity-list" class="activity-list"><p class="card activity-empty">正在读取演示活动…</p></div>
+        <div class="card exchange">
+          <span class="exchange-icon"><svg class="icon" aria-hidden="true"><use href="#i-bowl"/></svg></span>
+          <div><strong>小镇补给站</strong><p>领养后可换虚拟照护粮，也可留满 100 分申请演示赞助。照护粮可以留到下次使用。</p></div>
+          <button class="button secondary" id="exchange" type="button" disabled>用 50 公益积分换 1 份照护粮</button>
+          <p class="context-note" id="exchange-notice" role="status" hidden></p>
+        </div>
+      </section>
+    </div>
+
+    <div class="route-page" data-page="support" hidden>
+      <div class="section-heading route-heading">
+        <div>
+          <p class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg> 小镇之外 · 演示项目</p>
+          <h1 id="support-heading">救助项目与支持记录<span>。</span></h1>
+          <p class="section-description">查看项目需要的物资和已登记的进展，并体验模拟赞助或 PayPal 沙箱付款。</p>
+        </div>
+        <span class="route-balance">公益积分 <strong id="support-points">—</strong></span>
+      </div>
+      <div class="columns support-columns">
+        <div class="column">
+          <section class="card project" id="project" aria-labelledby="project-heading">
+            <div class="project-header">
+              <p class="eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-wave"/></svg> 项目档案 · 虚构样例</p>
+              <h2 id="project-heading">海龟夜间观察站</h2>
+              <p>潮汐湾野生动物救助站 · 模拟审核</p>
+            </div>
+            <div class="project-content">
+              <p>为夜间恢复区准备遮光用品，减少护理区的人造光干扰。</p>
+              <div class="target">
+                <div><span>项目样例目标</span><strong>US$100</strong></div>
+                <div><span>单次可支持</span><strong>遮光护理布 1 件</strong></div>
+              </div>
+              <section class="project-update" id="project-update" aria-label="机构记录样例" tabindex="-1">
+                <span class="update-dot"></span>
+                <div><strong id="project-update-title">已登记物资需求</strong><p id="project-update-meta">11 月 6 日 · 演示机构物资清单</p><p id="project-update-status">尚未确认送达或救助成果</p></div>
+              </section>
+              <details class="support-details" open>
+                <summary><span class="section-icon"><svg class="icon" aria-hidden="true"><use href="#i-leaf"/></svg></span><span><strong>用公益积分支持</strong><small>模拟赞助额度</small></span></summary>
+                <div class="support-body">
+                  <p>在附近活动报名并完成模拟核验。使用 100 公益积分，可为本项目预留 US$2 演示额度。</p>
+                  <p class="balance">本次演示赞助池剩余 <strong id="budget">—</strong></p>
+                  <div class="sponsor-buttons">
+                    <a class="button secondary" href="/activities">查看演示活动</a>
+                    <button class="button primary" id="allocate" type="button" disabled>预留 US$2</button>
+                  </div>
+                  <p class="context-note" id="sponsor-notice" role="status" hidden></p>
+                </div>
+              </details>
+              <details class="support-details" id="paypal-details">
+                <summary><span class="section-icon"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span><span><strong>PayPal 沙箱捐助</strong><small>测试资金 · USD</small></span></summary>
+                <form class="support-body" id="donation">
+                  <fieldset>
+                    <legend>选择测试金额</legend>
+                    <div class="amounts">
+                      <label><input type="radio" name="amount" value="500" checked><span>US$5</span></label>
+                      <label><input type="radio" name="amount" value="1000"><span>US$10</span></label>
+                      <label><input type="radio" name="amount" value="2000"><span>US$20</span></label>
+                    </div>
+                  </fieldset>
+                  <button class="button secondary" id="donate" type="submit" disabled>前往 PayPal 沙箱 <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+                  <p class="micro paypal-hint">正在读取沙箱配置…</p>
+                </form>
+              </details>
+              <details class="support-details">
+                <summary><span class="section-icon"><svg class="icon" aria-hidden="true"><use href="#i-box"/></svg></span><span><strong>为指定物资出资</strong><small>测试资金 · USD</small></span></summary>
+                <div class="support-body">
+                  <p>每笔测试订单 US$8 · 遮光护理布 1 件。沙箱交易只记录测试付款。</p>
+                  <button class="button secondary" id="supply" type="button" disabled>前往 PayPal 沙箱 <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+                  <p class="micro paypal-hint">正在读取沙箱配置…</p>
+                </div>
+              </details>
+            </div>
+          </section>
+        </div>
+        <div class="column">
+          <section class="card records" id="records" aria-labelledby="records-heading">
+            <p class="eyebrow">我的记录 · 沙箱与模拟</p>
+            <h2 id="records-heading">每一步，都有来处</h2>
+            <p>回看公益活动、兑换和项目支持记录。送达及救助结果由项目独立更新。</p>
+            <p class="feedback payment-feedback" id="payment-feedback" role="status" hidden></p>
+            <ul id="record-list" class="record-list"><li class="empty-record">正在读取演示记录…</li></ul>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="shell footer"><span><strong>HELPANI TOWN</strong> · 动物救助小镇</span><span>黑客松演示 · 潮汐湾样例</span></footer>
+  <nav class="mobile-dock" id="mobile-dock" aria-label="小镇导航">
+    <div class="mobile-dock-inner">
+      <a class="dock-action" id="mobile-town-link" data-route="town" href="/"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg>小镇</a>
+      <a class="dock-action" id="mobile-story-link" data-route="stories" href="/stories"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>故事</a>
+      <a class="dock-action" id="mobile-activities-link" data-route="activities" href="/activities"><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg>活动</a>
+      <a class="dock-action" id="mobile-support-link" data-route="support" href="/support"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>支持</a>
+    </div>
+  </nav>
+</body>
+</html>

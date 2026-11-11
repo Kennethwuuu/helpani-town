@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="440" viewBox="0 0 900 440">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1">
+      <stop stop-color="#204c40"/><stop offset="1" stop-color="#739171"/>
+    </linearGradient>
+    <pattern id="specks" width="22" height="18" patternUnits="userSpaceOnUse">
+      <path d="M3 4h1m12 4h1m-7 7h1m-8-2h1" stroke="#f6e8b7" stroke-width=".85" opacity=".5"/>
+    </pattern>
+    <g id="leaf" fill="currentColor"><path d="M0 0C3-10 16-13 22-11 19-4 10 3 0 0Z"/></g>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h900v440H0z"/>
+  <circle cx="468" cy="140" r="88" fill="#b0a975" opacity=".17"/>
+  <circle cx="468" cy="140" r="67" fill="#b7ae74" opacity=".2"/>
+  <circle cx="468" cy="140" r="47" fill="#e0c883"/>
+  <path d="M0 245c85-59 147-85 219-76 67 8 108 54 182 48 72-6 114-59 194-56 99 4 161 69 305 57v222H0Z" fill="#4f7356"/>
+  <path d="M0 267c140-34 230-21 322-5 106 18 151 32 245 14 115-22 200-53 333-34v198H0Z" fill="#456752"/>
+  <path d="M0 307c119-13 220 27 325 27 86 0 150-33 243-31 103 2 207 34 332 5v132H0Z" fill="#66805c"/>
+  <path d="M0 372c113-15 204 18 293 24 134 9 193-38 300-45 98-7 194 33 307 11v78H0Z" fill="#8b9369"/>
+  <path d="M0 372c113-15 204 18 293 24 134 9 193-38 300-45 98-7 194 33 307 11v78H0Z" fill="url(#specks)"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M90 341 71 51m33 287L121 81m52 259 8-161m618 183 21-285m-60 277-8-160m91 176 22-243" stroke="#2c5744" stroke-width="7"/>
+    <path d="M86 278 54 254m30-12 38-39m-40 2-33-27m56 100 33-28m663 44-34-26m36-14 41-35m-38-5-30-34m63 128 33-27" stroke="#2c5744" stroke-width="3.5"/>
+  </g>
+  <g color="#395e47">
+    <use href="#leaf" transform="translate(54 254) rotate(199) scale(1.75)"/><use href="#leaf" transform="translate(122 203) rotate(-15) scale(1.6)"/><use href="#leaf" transform="translate(48 177) rotate(210) scale(1.8)"/><use href="#leaf" transform="translate(138 250) rotate(-8) scale(1.65)"/>
+    <use href="#leaf" transform="translate(766 268) rotate(194) scale(1.75)"/><use href="#leaf" transform="translate(846 218) rotate(-10) scale(1.8)"/><use href="#leaf" transform="translate(775 181) rotate(217) scale(1.7)"/><use href="#leaf" transform="translate(873 279) rotate(-8) scale(1.55)"/>
+  </g>
+  <ellipse cx="425" cy="367" rx="209" ry="23" fill="#3d5a43" opacity=".58"/>
+  <g fill="#eed699" opacity=".8"><circle cx="310" cy="205" r="2.6"/><circle cx="623" cy="169" r="2.4"/><circle cx="632" cy="260" r="3"/><circle cx="287" cy="249" r="2"/><circle cx="660" cy="225" r="1.7"/></g>
+  <path d="M0 0h900v440H0Z" fill="url(#specks)" opacity=".25"/>
+</svg>

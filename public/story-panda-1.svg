@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300">
+  <style>
+    .peek { animation: peek 3.1s ease-in-out .25s; }
+    .frond { transform-origin: 610px 206px; animation: leaf-sway 3.5s ease-in-out .15s; }
+    @keyframes peek { 38% { transform: translateY(-9px); } 74% { transform: translateY(1px); } }
+    @keyframes leaf-sway { 48% { transform: rotate(3deg); } }
+    @media (prefers-reduced-motion: reduce) { .peek, .frond { animation: none; } }
+  </style>
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#224d41"/><stop offset="1" stop-color="#71896a"/></linearGradient>
+    <g id="leaf" fill="currentColor"><path d="M0 0C3-13 21-17 37-14 26-3 12 3 0 0Z"/><path d="M3-1c8-2 17-6 26-10" fill="none" stroke="#eadca0" stroke-width=".8" opacity=".45"/></g>
+    <pattern id="grain" width="23" height="19" patternUnits="userSpaceOnUse"><path d="M3 4h1m13 2h1m-9 7h1m10 3h1" fill="none" stroke="#f1d39e" stroke-width="1" opacity=".35"/></pattern>
+    <g id="face" stroke="#523b35" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-63-9C-89-63-72-84-53-77c17 5 26 21 30 36m47-1c7-23 19-38 36-35 19 4 23 29 4 67" fill="#bd704a"/>
+      <path d="M-62-36c-14-21-9-36 0-34 10 1 20 11 25 25m79 0c7-14 16-24 24-23 7 1 10 14 0 31" fill="#edc9a1" stroke="none"/>
+      <path d="M-74-10c0-30 34-53 74-53 43 0 74 22 76 50l12 9-12 6 5 8-12 4C60 35 35 50 1 50c-32 0-59-12-71-35l-14-4 6-8-12-6Z" fill="#c8794d"/>
+      <path d="M-70-7c16-9 32-7 47 8C-12 12-6 18 0 18c8 0 15-6 24-17 13-14 30-19 46-9l-1 16C60 31 34 43 0 44c-31 0-58-13-69-36Z" fill="#efd5a8" stroke="none"/>
+      <path d="M-61-1c9-11 22-11 33 3 5 7 1 14-8 15-11 0-22-7-25-18Zm123-1c-9-11-24-10-34 3-6 8-1 14 7 15 10 1 24-8 27-18Z" fill="#a65b43" stroke="none"/>
+      <path d="M-47-2q5-4 10 1m73 0q5-4 10 0M-9 26q9 8 18 0" fill="none" stroke="#523b35" stroke-width="2.8"/>
+      <path d="M-8 16c2-4 14-5 16 0 1 4-4 8-8 8s-9-4-8-8Z" fill="#4d3a31" stroke="none"/>
+      <path d="M-45-27c8-7 16-9 24-8m42 0c8-1 16 1 24 8" stroke="#e8a170" stroke-width="2.3" fill="none"/>
+    </g>
+
+  </defs>
+  <path d="M0 0h720v300H0Z" fill="url(#sky)"/>
+  <circle cx="432" cy="82" r="69" fill="#cfcd87" opacity=".16"/>
+  <circle cx="432" cy="82" r="45" fill="#f3cf86"/>
+  <path d="M0 172c50-45 115-50 168-34 54 16 75 38 130 30 55-8 80-25 119-30 42-5 84 17 127 16 65-2 115-46 176-43v189H0Z" fill="#668364"/>
+  <path d="M0 195c78-29 134-7 198 18 79 31 110 0 180-19 77-21 106-3 172 8 64 12 109-3 170-32v130H0Z" fill="#4c7057"/>
+  <path d="M0 40C75-2 156-13 251 9c51 12 80 28 114 52C277 53 205 68 165 85 103 111 65 108 0 107Zm720-16c-96-38-174-16-243 21 83-15 113 2 153 17 36 15 63 18 90 9Z" fill="#2c5b48"/>
+  <path d="M28 300C33 239 31 151 23 78 20 47 17 26 11 0h43c17 50 25 88 28 129 36-31 96-64 160-78l5 9C179 85 130 116 83 168c5 38 8 77 9 132Z" fill="#294e40"/>
+  <path d="M0 237c92-24 181-36 260-32 62 4 124 8 182-9 53-15 114-40 178-45l15 13c-63 9-112 34-176 54-54 17-122 24-202 19-85-5-168 5-257 28Z" fill="#456047" stroke="#2f5142" stroke-width="3"/>
+  <path d="M165 212c63-7 139-6 190-5m108-6c27-7 57-20 84-29" fill="none" stroke="#9fa16e" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+  <g class="peek">
+    <g transform="translate(346 159) scale(1.13)">
+      <path d="M-66 40c-18 7-25 18-24 33h174c-1-18-14-30-36-34Z" fill="#98543b" stroke="#523b35" stroke-width="3"/>
+      <use href="#face"/>
+      <path d="M-70 56c9-5 26-4 33 4 4 6 1 12-9 13h-21c-9-1-11-10-3-17Zm101 4c7-8 24-9 32-3 8 6 5 15-3 16H39c-9-1-12-7-8-13Z" fill="#563e35" stroke="#523b35" stroke-width="2.7"/>
+    </g>
+  </g>
+  <path d="M0 259c72-5 156-22 244-25 75-3 158 4 240-20-56 27-147 42-231 42-104 0-174 18-253 26Z" fill="#354f40"/>
+  <g color="#a7a976">
+    <use href="#leaf" transform="translate(234 220) rotate(194) scale(1.5)"/><use href="#leaf" transform="translate(218 219) rotate(234) scale(1.15)"/>
+    <use href="#leaf" transform="translate(460 210) rotate(22) scale(1.5)"/><use href="#leaf" transform="translate(474 213) rotate(-26) scale(1.15)"/>
+  </g>
+  <g class="frond" color="#729160">
+    <path d="M604 259c25-38 57-68 103-83m-91 44 14-44m7 25 32-36" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <use href="#leaf" transform="translate(631 179) rotate(-73) scale(1.55)"/><use href="#leaf" transform="translate(642 205) rotate(1) scale(1.8)"/><use href="#leaf" transform="translate(667 170) rotate(-38) scale(1.5)"/><use href="#leaf" transform="translate(687 185) rotate(2) scale(1.6)"/>
+  </g>
+  <path d="M0 279c90-24 124-16 182 21H0Zm720-43c-78 7-111 26-163 64h163Z" fill="#2a5445"/>
+  <g fill="#f5da9a"><circle cx="193" cy="119" r="2.1"/><circle cx="485" cy="114" r="2.4"/><circle cx="555" cy="88" r="1.6"/><circle cx="602" cy="121" r="1.7"/></g>
+  <path d="M0 0h720v300H0Z" fill="url(#grain)" opacity=".3" pointer-events="none"/>
+</svg>

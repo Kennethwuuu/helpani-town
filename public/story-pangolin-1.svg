@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300">
+  <style>
+    .fireflies { animation: glow 2.8s ease-in-out 1; }
+    .peek { animation: peek 2.8s ease-in-out 1; }
+    @keyframes glow { 50% { opacity: .35; } }
+    @keyframes peek { 45%, 65% { transform: translateX(-7px); } }
+    @media (prefers-reduced-motion: reduce) { .fireflies, .peek { animation: none; } }
+  </style>
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#2b4547"/><stop offset="1" stop-color="#849478"/></linearGradient>
+    <linearGradient id="earth" x2="0" y2="1"><stop stop-color="#7b7954"/><stop offset="1" stop-color="#3b5141"/></linearGradient>
+    <pattern id="scales" width="34" height="22" patternUnits="userSpaceOnUse">
+      <path d="M0 1h34c-3 11-10 17-17 20C10 18 3 12 0 1Zm-17-11h34C14 1 7 7 0 10c-7-3-14-9-17-20Zm34 0h34C48 1 41 7 34 10c-7-3-14-9-17-20Z" fill="#a98658" stroke="#614c39" stroke-width="1.5"/>
+      <path d="M17 5v9M0-6v9m34-9v9" stroke="#d3ae72" stroke-width="1.2" stroke-linecap="round"/>
+    </pattern>
+    <clipPath id="back"><path d="M346 172c29-43 82-59 129-38 31 14 57 48 49 83-40-13-62-12-102 1-37 12-71-2-85-22Z"/></clipPath>
+    <g id="fern" fill="currentColor">
+      <path d="M0 0C1-39 9-66 29-85 17-64 10-35 4 0Z"/>
+      <path d="M5-17c-16-4-22-17-25-24 14 2 23 14 25 24Zm5-13c11-12 25-16 34-13-11 10-23 15-34 13Zm1-12c-13-4-18-15-20-22 12 4 17 13 20 22Zm7-13c7-10 17-13 28-12-8 10-18 14-28 12Z"/>
+    </g>
+    <g id="leaf"><path d="M0 0C10-9 24-9 31-5 22 3 10 7 0 0Z" fill="currentColor"/><path d="M1 0 25-4" stroke="#dbc38e" stroke-width=".9" opacity=".7"/></g>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h720v300H0Z"/>
+  <circle cx="162" cy="72" r="54" fill="#e3d6a1" opacity=".14"/>
+  <circle cx="162" cy="72" r="32" fill="#ead89f"/>
+  <path d="M0 147c107-41 159-27 252-4 87 21 161 2 241-19 68-18 146-15 227 9v167H0Z" fill="#5f775e"/>
+  <path d="M0 189c90-40 175-31 247-25 124 10 167-10 255-24 88-13 143 2 218 15v145H0Z" fill="#4a6653"/>
+  <path d="M21 213 15 0h25l9 206Zm53-13L63 21l14-4 13 180ZM667 211l11-211h28l-15 214Z" fill="#314e43"/>
+  <path d="M33 66 0 43v-8l37 17Zm5 38 66-59 5 6-66 75ZM686 70l-53-43 4-8 52 32Z" fill="#314e43"/>
+  <path d="M0 222c90-13 167-21 254-8 72 11 133-42 181-76 65-46 153-36 285 11v151H0Z" fill="url(#earth)"/>
+  <path d="M290 221c29-42 75-76 124-85 67-11 107 22 114 81Z" fill="#a18d61"/>
+  <path d="M308 225c21-43 67-71 114-75 55-5 87 28 89 73Z" fill="#273e34"/>
+  <ellipse cx="411" cy="225" rx="144" ry="11" fill="#304436" opacity=".8"/>
+  <g class="peek">
+    <path d="M346 172c29-43 82-59 129-38 31 14 57 48 49 83-40-13-62-12-102 1-37 12-71-2-85-22Z" fill="url(#scales)" stroke="#584835" stroke-width="3.5"/>
+    <g clip-path="url(#back)"><path d="M341 182c64 38 119 15 185 17v41H341Z" fill="#62513d" opacity=".34"/></g>
+    <path d="M376 193c-6 4-22 18-23 25 0 6 10 9 19 5l22-17" fill="#927c53" stroke="#5a4d37" stroke-width="3"/>
+    <path d="M353 173c-18-9-37-4-53 8-12 8-25 19-38 26 14 10 30 3 45 0 10-2 20 1 32 1 17-1 24-10 25-20Z" fill="#b9a57a" stroke="#574d38" stroke-width="3.4" stroke-linejoin="round"/>
+    <path d="M318 176c1-9 7-12 12-8 3 2 4 6 1 10" fill="#d4be90" stroke="#69553e" stroke-width="2"/>
+    <circle cx="311" cy="187" r="3" fill="#413d2e"/>
+    <path d="M262 207q10-2 15-8c-1 7-8 12-15 8Z" fill="#544738"/>
+    <path d="M358 220l-4 4m10-4-2 5" stroke="#e2c99c" stroke-width="1.7" stroke-linecap="round"/>
+  </g>
+  <path d="M517 142c57-26 136-17 203 12v146H509c-2-37 12-61 15-82 6-34 2-53-7-76Z" fill="#696c4b"/>
+  <path d="M0 251c82-21 181-11 266 6 103 21 165 7 243-9 64-13 145-13 211 8v44H0Z" fill="#697551"/>
+  <g color="#395c46"><use href="#fern" transform="translate(77 253) rotate(-14) scale(1.15)"/><use href="#fern" transform="translate(102 255) scale(.86)"/><use href="#fern" transform="translate(620 259) rotate(20) scale(1.1)"/><use href="#fern" transform="translate(684 265) rotate(-17) scale(1.05)"/></g>
+  <g color="#ae8a55"><use href="#leaf" transform="translate(223 239) rotate(13)"/><use href="#leaf" transform="translate(292 250) rotate(-17)"/><use href="#leaf" transform="translate(354 265) rotate(15)"/><use href="#leaf" transform="translate(467 244) rotate(-15)"/><use href="#leaf" transform="translate(554 267) rotate(11)"/></g>
+  <g class="fireflies" fill="#f2dea4"><circle cx="199" cy="142" r="2.8"/><circle cx="247" cy="168" r="2.2"/><circle cx="559" cy="179" r="2.6"/><circle cx="596" cy="150" r="2.1"/></g>
+</svg>

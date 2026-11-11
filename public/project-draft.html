@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <script>
+    // File previews have no HTTP origin or game API. Use the npm start entrypoint.
+    if (location.protocol === 'file:') {
+      location.replace('http://localhost:3000/project-draft' + location.search + location.hash);
+    }
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f4ea">
+  <title>救助任务草稿 · Helpani Town</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/organizer.css">
+  <script defer src="/project-draft.js"></script>
+</head>
+<body>
+  <a class="skip" href="#draft-main">跳至任务草稿</a>
+  <header class="header">
+    <div class="shell header-inner organizer-header">
+      <a class="brand" href="/">动物救助小镇</a>
+      <a class="button secondary organizer-back" href="/organizer">返回活动核验台</a>
+    </div>
+  </header>
+  <main class="shell" id="draft-main">
+    <div class="organizer-hero">
+      <div>
+        <p class="eyebrow">潮汐湾 · 组织方演示</p>
+        <h1>救助任务草稿<span>。</span></h1>
+        <p>选择海龟夜间观察站的样例资料，请 Astropods 生成带来源的虚拟观察任务草稿。</p>
+      </div>
+      <span class="demo-pill"><span></span>虚构救助项目</span>
+    </div>
+    <div class="columns draft-columns">
+      <form class="card organizer-panel draft-panel" id="draft-form">
+        <h2>选择资料</h2>
+        <div id="draft-sources" class="draft-sources"></div>
+        <button class="button primary" id="generate-draft" type="submit" disabled>生成任务草稿</button>
+        <p class="organizer-micro" id="draft-status" role="status">正在读取资料和 Astropods 配置状态…</p>
+      </form>
+      <section class="card organizer-panel draft-panel" aria-labelledby="draft-heading">
+        <h2 id="draft-heading">供组织方核对</h2>
+        <p id="draft-placeholder">生成后可逐条打开引用，核对任务内容。</p>
+        <div class="draft-content" id="draft-content" hidden>
+          <div><h3>资料摘要</h3><p id="draft-summary"></p></div>
+          <div><h3>预算待确认项</h3><ul id="draft-flags"></ul></div>
+          <div><h3 id="draft-title"></h3><p id="draft-instructions"></p></div>
+          <div><h3>任务引用</h3><ul id="draft-citations"></ul></div>
+          <p class="organizer-micro">Astropods 生成的草稿，仅供组织方在演示中核对。</p>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer class="shell footer"><span><strong>HELPANI TOWN</strong> · 动物救助小镇</span></footer>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <script>
+    // File previews have no HTTP origin or game API. Use the npm start entrypoint.
+    if (location.protocol === 'file:') {
+      location.replace('http://localhost:3000/organizer' + location.search + location.hash);
+    }
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f4ea">
+  <meta name="description" content="Helpani Town 野生动物友好行动模拟核验台">
+  <title>活动核验台 · Helpani Town</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/organizer.css">
+  <script defer src="/vendor/ag-grid-community.min.js"></script>
+  <script defer src="/organizer.js"></script>
+</head>
+<body>
+  <a class="skip" href="#organizer-main">跳至核验台</a>
+  <header class="header">
+    <div class="shell header-inner organizer-header">
+      <a class="brand" href="/" aria-label="返回动物救助小镇首页">
+        <span class="brand-mark"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c2-5 6-8 10-10M7 16C1 8 11 3 20 4c0 9-6 16-13 12Z"/></svg></span>
+        <span>动物救助小镇<small>HELPANI TOWN</small></span>
+      </a>
+      <a class="button secondary organizer-back" href="/activities"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>返回附近活动</a>
+    </div>
+  </header>
+
+  <main class="shell organizer-main" id="organizer-main">
+    <div class="organizer-hero">
+      <div>
+        <p class="eyebrow"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-3-2-4 2-4-2-3 2V4a1 1 0 0 1 1-1Zm3 5h6m-6 4h6"/></svg> 模拟组织方工作台</p>
+        <h1>活动核验台<span>。</span></h1>
+        <p>查看野生动物友好行动的报名，模拟确认完成后，将公益积分发到小镇钱包。</p>
+      </div>
+      <div class="organizer-shortcuts">
+        <span class="demo-pill"><span></span>上海 · 演示场景</span>
+        <a href="/project-draft">救助资料 → 生成任务草稿</a>
+      </div>
+    </div>
+    <div class="notice organizer-disclosure"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6m-5 0v7l-6 9a1 1 0 0 0 1 2h14a1 1 0 0 0 1-2l-6-9V3M8 14h8"/></svg><p>活动和核验均为虚构演示。这里只显示当前浏览器演示会话的报名。</p></div>
+
+    <dl class="organizer-metrics" aria-label="本次演示统计">
+      <div><dt>待模拟核验</dt><dd id="pending-count">—</dd></div>
+      <div><dt>已模拟核验</dt><dd id="verified-count">—</dd></div>
+      <div><dt>小镇公益积分余额</dt><dd id="organizer-points">—</dd></div>
+    </dl>
+
+    <section class="card organizer-panel" aria-labelledby="registrations-heading">
+      <div class="organizer-panel-heading">
+        <div><p class="eyebrow">报名与核验 · AG GRID COMMUNITY</p><h2 id="registrations-heading">活动报名</h2></div>
+        <button class="button secondary" id="refresh-registrations" type="button" disabled><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2 6m2-6V5m0 6h-6"/></svg>刷新报名</button>
+      </div>
+
+      <div class="organizer-filters" role="group" aria-label="报名筛选">
+        <label><span>搜索</span><input type="search" id="registration-search" placeholder="输入活动名称" disabled></label>
+        <label><span>核验状态</span><select id="registration-filter" disabled><option value="">全部</option><option value="signed_up">待模拟核验</option><option value="verified">已模拟核验</option></select></label>
+      </div>
+      <p id="organizer-feedback" class="feedback organizer-feedback" hidden></p>
+      <p id="organizer-live" class="organizer-sr" role="status"></p>
+      <div id="registration-grid" class="registration-grid"></div>
+      <p class="organizer-micro" id="grid-instructions">用方向键浏览表格。将焦点移至「模拟核验」单元格后，按回车或空格执行。</p>
+      <div class="organizer-empty" id="registration-empty" hidden>
+        <p>先在小镇报名一项演示活动，这里就会出现待核验记录。</p>
+        <a class="button secondary" href="/activities">前往附近活动</a>
+      </div>
+      <noscript><p class="organizer-empty">请启用 JavaScript 以加载演示报名表。</p></noscript>
+    </section>
+  </main>
+
+  <footer class="shell footer"><span><strong>HELPANI TOWN</strong> · 动物救助小镇</span><span>黑客松原型 · 组织方演示</span></footer>
+</body>
+</html>
