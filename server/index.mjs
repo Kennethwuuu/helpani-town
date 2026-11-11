@@ -4,7 +4,7 @@ import { createServer } from 'node:http';
 import { dirname, resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { capturePayPalOrder, createPayPalOrder, paypalConfigured } from './paypal.mjs';
-import { generateProjectDraft, projectAiConfigured, ProjectDraftError, projectSources } from './project-ai.mjs';
+import { auditProjectBudget, generateProjectDraft, projectAiConfigured, projectAiStatus, ProjectDraftError, projectSources } from './project-ai.mjs';
 import { createGameStore, GameError } from './game.mjs';
 import { companionPatrols } from './companion-patrol.mjs';
 
@@ -119,6 +119,7 @@ const assets = new Map([
   ['/organizer.css', ['../public/organizer.css', 'text/css; charset=utf-8']],
   ['/project-draft', ['../public/project-draft.html', 'text/html; charset=utf-8']],
   ['/project-draft.js', ['../public/project-draft.js', 'text/javascript; charset=utf-8']],
+  ['/project-draft.css', ['../public/project-draft.css', 'text/css; charset=utf-8']],
   ['/vendor/ag-grid-community.min.js', ['../node_modules/ag-grid-community/dist/ag-grid-community.min.js', 'text/javascript; charset=utf-8']],
 ]);
 for (const { medalCatalog } of Object.values(companionPatrols)) {
@@ -351,7 +352,14 @@ const server = createServer(async (req, res) => {
       return json(res, 200, organizerState(state(sessionId)));
     }
     if (req.method === 'GET' && path === '/api/project-draft') {
-      return json(res, 200, { enabled: projectAiConfigured(), provider: 'Astropods', sources: projectSources });
+      return json(res, 200, {
+        enabled: projectAiConfigured(), provider: 'Astropods', sources: projectSources,
+        configuration: projectAiStatus(), budgetAudit: auditProjectBudget(projectSources.map(({ id }) => id)),
+      });
+    }
+    if (req.method === 'POST' && path === '/api/project-budget') {
+      const { sourceIds } = (await readJson(req)) ?? {};
+      return json(res, 200, auditProjectBudget(sourceIds));
     }
     if (req.method === 'POST' && path === '/api/project-draft') {
       const { sourceIds } = (await readJson(req)) ?? {};
@@ -507,7 +515,7 @@ const server = createServer(async (req, res) => {
     const knownError = error instanceof RequestError || error instanceof ProjectDraftError || error instanceof GameError;
     const status = knownError ? error.status : error.code === 'ENOENT' ? 404 : 502;
     if (status >= 500 && !knownError) console.error('Request failed:', error.message);
-    if (!res.headersSent) json(res, status, { error: knownError ? error.message : '暂时无法完成，请稍后重试。', ...(error instanceof GameError && error.state ? { state: error.state } : {}) });
+    if (!res.headersSent) json(res, status, { error: knownError ? error.message : '暂时无法完成，请稍后重试。', ...(error instanceof ProjectDraftError && error.code ? { code: error.code } : {}), ...(error instanceof GameError && error.state ? { state: error.state } : {}) });
   }
 });
 

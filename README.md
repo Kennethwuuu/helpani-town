@@ -1,5 +1,7 @@
 # Helpani Town 动物救助小镇
 
+[English judge guide](docs/judges-guide.md) · [English demo script](docs/demo-script-en.md)
+
 一个聚焦野生动物保护与救助的公益游戏原型。玩家选择或随机遇见一位虚拟动物伙伴，喂养并解锁成长手记，也可以浏览上海样例活动，体验报名、模拟核验和项目支持。项目、机构、活动、赞助预算及救助更新均为演示数据。
 
 本轮“小熊猫的新休息角落”以动物自主生活为核心：观察竹竹探索、攀爬和休息，选择平台位置，再拍下自己布置中的瞬间。生活、布置、摄影与巡护带回木道的闭环已实现并实际试玩。巡护包含 6 道科普问答、答案解释、资料来源和知识册，见 [问答实现与验收](docs/patrol-quiz-2026-11-09.md)。最新完成首次掌握反馈、针对错误的解释、插画勋章揭晓和可保存到照片的勋章角标，见 [奖励实现与试玩记录](docs/quiz-rewards-2026-11-09.md)。动作、恢复与摄影复测见 [2026-11-09 测试记录](docs/playtest-2026-11-09.md)，初次验收及头部造型修复见 [2026-11-08 试玩记录](docs/playtest-2026-11-08.md)。功能说明不代替验收记录。
@@ -46,6 +48,8 @@ npm test
 
 2026 年 11 月 11 日已跑通一笔 USD 5.00 沙箱捐助，远端订单及捕获均为 `COMPLETED`，并与本地账本核对一致。覆盖范围与待补项见 [PayPal Sandbox 联调记录](docs/paypal-sandbox-2026-11-11.md)。
 
+随后完成 USD 8 指定物资付款、买家取消再发起，以及活动报名到核验积分和模拟赞助的界面验收，三项均通过；范围与原始证据见 [本轮增量测试报告](docs/qa-report-2026-11-11.md)。
+
 可将 [Postman 集合](tools/postman/helpani.postman_collection.json) 和 [空白环境模板](tools/postman/helpani.postman_environment.json) 导入 Postman。前两个文件夹只调用本地服务，验证金额校验、报名核验和积分去重。第三个文件夹使用独立的 PayPal Sandbox 测试订单，按各请求的说明逐项发送。沙箱凭据只填在私有环境中，买家在浏览器授权后再确认捕获。要验证小镇订单回跳及账本更新，请通过小镇页面另走一次完整结账。 [PayPal 官方 Postman 指南](https://developer.paypal.com/api/rest/postman/)
 
 ## 试玩路线
@@ -60,12 +64,22 @@ npm test
 
 ## 救助任务草稿
 
-登录 Astropods，获取账户的 AI Gateway 专用密钥和网关主机地址。参考 `.env.example`，在服务端的 `.env` 设置以下变量并重启小镇。请使用网关账户密钥，登录 CLI 的 OAuth 令牌用于 Astropods 平台管理。 [Astropods 登录](https://astropods.com/login) · [赛事资源](https://paypalaihackathon.devpost.com/details/astropods) · [官方 API 索引](https://docs.astropods.com/llms.txt)
+先按 [Astropods 接入步骤](docs/astropods-setup.md) 注册并取得获准的 Gateway 配置。官方 Gateway 项目通过 CLI 登录后在运行环境注入网关变量；不要把 CLI 登录令牌当作模型密钥。参考 `.env.example` 填写本机私有配置并重启小镇。 [赛事资源](https://paypalaihackathon.devpost.com/details/astropods) · [官方 Gateway 说明](https://docs.astropods.com/ai-gateway)
 
 | 变量 | 值 |
 | --- | --- |
 | `ASTRO_GATEWAY_URL` | 平台提供的 HTTPS 网关主机地址。服务端会追加 `/v1/chat/completions`。 |
 | `ASTRO_GATEWAY_API_KEY` | AI Gateway 账户密钥。保存在服务端私有配置中。 |
-| `ASTRO_GATEWAY_MODEL` | 可选，默认 `claude-haiku-4-5`。 |
+| `ASTRO_GATEWAY_MODEL` | 可选，其次使用运行环境的 `MODEL_DEFAULT`，最后默认 `claude-haiku-4-5`。 |
 
-从组织方演示台打开 `/project-draft`，勾选虚构的救助资料。生成结果包含摘要、预算待确认项和虚拟观察任务，任务引用可跳回所选资料供人工核对。未配置网关时仍可浏览样例资料，页面会显示待配置状态。 [Astropods Chat Completions](https://docs.astropods.com/ai-gateway/chat) · [MVP 方案](docs/mvp.md)
+从组织方演示台打开 `/project-draft`，勾选虚构资料。独立的资料预算核对通过服务端程序计算金额：完整资料下目标 US$100、物资 US$64、未分项 US$36；仅观察资料下显示预算缺失，不沿用旧金额。这部分不调用模型，也不修改付款或积分。
+
+网关配置后，Astropods 生成摘要、预算待确认建议和虚拟观察任务。页面区分程序金额核对与 AI 建议，显示请求模型、所选资料与任务引用，并保留人工复核标记。更换资料或请求失败会清除旧草稿。未配置时仍可核对预算，不能生成假 AI 结果。 [Astropods Chat Completions](https://docs.astropods.com/ai-gateway/chat) · [MVP 方案](docs/mvp.md)
+
+```bash
+npm run doctor    # 只检查本地运行与配置，不调用服务
+npm run test:ai   # 新增 AI 单元与 HTTP 测试，不调用外部服务
+npm run check:ai  # 显式发出两次实际网关请求；需要有效配置
+```
+
+`doctor` 的已配置标记不代表凭据有效；`check:ai` 的结构通过也不代替对生成内容的人工核对。当前真实 AI 联调仍等待账户和网关权限。

@@ -10,13 +10,15 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f6f4ea">
+  <meta name="description" content="核对救助项目的样例预算，再用 Astropods 整理有来源的虚拟任务草稿。">
   <title>救助任务草稿 · Helpani Town</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/organizer.css">
+  <link rel="stylesheet" href="/project-draft.css">
   <script defer src="/project-draft.js"></script>
 </head>
-<body>
+<body class="draft-page">
   <a class="skip" href="#draft-main">跳至任务草稿</a>
   <header class="header">
     <div class="shell header-inner organizer-header">
@@ -29,30 +31,70 @@
       <div>
         <p class="eyebrow">潮汐湾 · 组织方演示</p>
         <h1>救助任务草稿<span>。</span></h1>
-        <p>选择海龟夜间观察站的样例资料，请 Astropods 生成带来源的虚拟观察任务草稿。</p>
+        <p>先核对所选资料的预算，再请 Astropods 起草一份有来源的虚拟观察任务。</p>
       </div>
       <span class="demo-pill"><span></span>虚构救助项目</span>
     </div>
-    <div class="columns draft-columns">
-      <form class="card organizer-panel draft-panel" id="draft-form">
-        <h2>选择资料</h2>
-        <div id="draft-sources" class="draft-sources"></div>
-        <button class="button primary" id="generate-draft" type="submit" disabled>生成任务草稿</button>
-        <p class="organizer-micro" id="draft-status" role="status">正在读取资料和 Astropods 配置状态…</p>
+    <p class="notice draft-disclosure">机构、预算与救助进展均为演示资料。草稿需经组织方人工核对后使用。</p>
+
+    <div class="draft-columns">
+      <form class="card draft-panel" id="draft-form" aria-labelledby="sources-heading">
+        <div class="draft-panel-heading">
+          <div><p class="eyebrow">01 · 选择依据</p><h2 id="sources-heading">本次参考资料</h2></div>
+          <span class="tag" id="draft-source-count">读取中</span>
+        </div>
+        <p class="draft-description">勾选要采用的记录。预算和新草稿会跟随本次选择。</p>
+        <fieldset id="draft-sources" class="draft-sources">
+          <legend class="draft-sr">勾选本次参考资料</legend>
+        </fieldset>
+        <p class="draft-description" id="draft-source-status">正在读取项目资料…</p>
+        <button class="button secondary" id="retry-sources" type="button" hidden>重新读取资料</button>
       </form>
-      <section class="card organizer-panel draft-panel" aria-labelledby="draft-heading">
-        <h2 id="draft-heading">供组织方核对</h2>
-        <p id="draft-placeholder">生成后可逐条打开引用，核对任务内容。</p>
-        <div class="draft-content" id="draft-content" hidden>
-          <div><h3>资料摘要</h3><p id="draft-summary"></p></div>
-          <div><h3>预算待确认项</h3><ul id="draft-flags"></ul></div>
-          <div><h3 id="draft-title"></h3><p id="draft-instructions"></p></div>
-          <div><h3>任务引用</h3><ul id="draft-citations"></ul></div>
-          <p class="organizer-micro">Astropods 生成的草稿，仅供组织方在演示中核对。</p>
+
+      <section class="card draft-panel" id="budget-audit" aria-labelledby="budget-heading">
+        <div class="draft-panel-heading">
+          <div><p class="eyebrow">02 · 对照原始记录</p><h2 id="budget-heading">资料预算核对</h2></div>
+          <span class="tag tag-green">按资料计算</span>
+        </div>
+        <p class="draft-description">金额来自所选资料中的数量、单价和目标。资料未记载的部分会标为待补充。</p>
+        <p class="draft-status" id="budget-status" role="status">资料读取后即可核对预算。</p>
+        <button class="button secondary" id="retry-budget" type="button" hidden>重新核对预算</button>
+        <div id="budget-content" hidden>
+          <dl class="budget-totals" aria-label="所选资料的金额">
+            <div><dt>项目目标</dt><dd id="budget-target">待补充</dd></div>
+            <div><dt>已列明物资</dt><dd id="budget-itemized">待补充</dd></div>
+            <div><dt>尚未分项</dt><dd id="budget-unallocated">待补充</dd></div>
+          </dl>
+          <h3 class="draft-subheading">物资计算</h3>
+          <ul id="budget-line-items" class="budget-line-items"></ul>
+          <h3 class="draft-subheading">资料待确认项</h3>
+          <ul id="budget-findings" class="budget-findings"></ul>
         </div>
       </section>
     </div>
+
+    <section class="card draft-panel draft-result" aria-labelledby="draft-heading">
+      <div class="draft-panel-heading draft-result-heading">
+        <div><p class="eyebrow">03 · 起草并核对</p><h2 id="draft-heading">AI 任务草稿</h2></div>
+        <button class="button primary" id="generate-draft" type="submit" form="draft-form" disabled>生成任务草稿</button>
+      </div>
+      <p class="draft-description" id="draft-config-status">正在读取 Astropods 配置状态…</p>
+      <p class="draft-status" id="draft-status" role="status">正在读取资料…</p>
+      <p id="draft-placeholder" class="draft-placeholder">选好资料后，可以生成摘要、建议复核项和一项虚拟观察任务。</p>
+      <div class="draft-content" id="draft-content" hidden>
+        <div class="draft-provenance">
+          <p id="draft-generation"></p>
+          <span class="tag tag-yellow" id="draft-review-label">待人工核对</span>
+        </div>
+        <p class="draft-inputs" id="draft-inputs"></p>
+        <div class="draft-output-grid">
+          <section class="draft-output-card" aria-labelledby="summary-heading"><h3 id="summary-heading">资料摘要</h3><p id="draft-summary"></p></section>
+          <section class="draft-output-card draft-ai-flags" aria-labelledby="flags-heading"><h3 id="flags-heading">AI 建议复核项</h3><p class="draft-description">结合上方资料计算与原始记录逐项确认。</p><ul id="draft-flags"></ul></section>
+          <section class="draft-output-card draft-task" aria-labelledby="draft-title"><p class="eyebrow">虚拟小镇内的观察任务</p><h3 id="draft-title"></h3><p id="draft-instructions"></p><h4>任务引用</h4><ul id="draft-citations"></ul></section>
+        </div>
+      </div>
+    </section>
   </main>
-  <footer class="shell footer"><span><strong>HELPANI TOWN</strong> · 动物救助小镇</span></footer>
+  <footer class="shell footer"><span><strong>HELPANI TOWN</strong> · 动物救助小镇</span><span>组织方演示 · 所有资料均为虚构</span></footer>
 </body>
 </html>
