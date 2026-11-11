@@ -17,14 +17,28 @@
 
 ## 本地运行
 
-需要 Node.js 22.13 或更高版本。SQLite 随 Node 提供，`npm ci` 会安装组织方演示台使用的 AG Grid Community。
+需要 Node.js 22.13 或更高版本。SQLite 随 Node 提供，`npm ci` 会安装组织方演示台使用的 AG Grid Community。当前交接版本在 `codex/ai-draft-readiness`，`main` 仍为较早版本；克隆私有仓库需要现有访问权限。
 
 ```bash
+git clone --branch codex/ai-draft-readiness https://github.com/Kennethwuuu/helpani-town.git
+cd helpani-town
 npm ci
+cp .env.example .env
+npm run doctor
 npm start
 ```
 
-在浏览器打开 `http://localhost:3000`。请先启动服务；直接预览 `public/*.html` 会跳到默认服务地址，游戏资源和 API 需要通过 HTTP 加载。自定义端口请直接打开对应的 HTTP 地址。首次运行会创建 `data/helpani.sqlite`。小镇、布局、观察、巡护、演示账本和沙箱付款记录使用 SQLite 保存，按当前浏览器的演示会话隔离；会话 Cookie 保留 30 天，没有正式账号或跨设备恢复。无痕窗口可体验新的演示会话，每个会话使用独立的模拟预算。
+已有本地仓库时，在仓库目录执行 `git switch codex/ai-draft-readiness` 替代前两行，再继续安装；已有私有 `.env` 时保留其内容。默认不填 PayPal 和 AI 密钥也能体验动物照顾、巡护及模拟活动；沙箱支付和 AI 生成保持未配置状态，资料预算核对仍可使用。`doctor` 不调用外部服务。
+
+在浏览器打开 `http://localhost:3000`。请先启动服务；直接预览 `public/*.html` 会跳到默认服务地址，游戏资源和 API 需要通过 HTTP 加载。首次运行会创建 `data/helpani.sqlite`。小镇、布局、观察、巡护、演示账本和沙箱付款记录使用 SQLite 保存，按当前浏览器的演示会话隔离；会话 Cookie 保留 30 天，没有正式账号或跨设备恢复。无痕窗口可体验新的演示会话，每个会话使用独立的模拟预算。
+
+如果 3000 端口已有服务，占用不会被自动替换。选择空闲端口，并同时设置 `HOST`、`PORT`、`PUBLIC_ORIGIN`；需要独立数据时将 `DB_PATH` 指向尚不存在的新文件。例如：
+
+```bash
+HOST=127.0.0.1 PORT=3120 PUBLIC_ORIGIN=http://127.0.0.1:3120 DB_PATH=data/helpani-3120-new.sqlite npm start
+```
+
+此时打开 `http://127.0.0.1:3120`，继续使用相同地址。新数据库路径会保留原有数据文件；再次使用该路径则延续该数据库的记录。
 
 照片使用 IndexedDB，仅保存在当前浏览器和当前网站地址下；刷新、重开后可回看，清除网站数据会移除照片，建议下载 PNG 备份。`localhost` 与 `127.0.0.1` 是不同网站地址，请用同一个地址继续试玩。
 
@@ -64,7 +78,7 @@ npm test
 
 ## 救助任务草稿
 
-先按 [Astropods 接入步骤](docs/astropods-setup.md) 注册并取得获准的 Gateway 配置。官方 Gateway 项目通过 CLI 登录后在运行环境注入网关变量；不要把 CLI 登录令牌当作模型密钥。参考 `.env.example` 填写本机私有配置并重启小镇。 [赛事资源](https://paypalaihackathon.devpost.com/details/astropods) · [官方 Gateway 说明](https://docs.astropods.com/ai-gateway)
+先按 [Astropods 接入步骤](docs/astropods-setup.md) 注册，使用官方账户 Gateway key API 为独立 Node 服务创建获准的模型密钥，无需 Docker。Gateway agent starter 的运行环境注入是可选接入方式。CLI 登录令牌用于账户管理，不能当作模型密钥；参考 `.env.example` 将 Gateway 配置填入本机私有 `.env` 并重启小镇。 [账户密钥 API](https://docs.astropods.com/api-reference/astropods-api/ai-gateway/create-an-ai-gateway-account-key) · [赛事资源](https://paypalaihackathon.devpost.com/details/astropods) · [官方 Gateway 说明](https://docs.astropods.com/ai-gateway)
 
 | 变量 | 值 |
 | --- | --- |
@@ -80,4 +94,4 @@ npm run test:ai   # 新增 AI 单元与 HTTP 测试，不调用外部服务
 npm run check:ai  # 两次真实草稿操作；每份至多一次格式重试，共至多四次网关请求
 ```
 
-Sonnet 4.6 的两组 CLI 检查及最终浏览器验收已通过；浏览器两次草稿操作实际使用三次网关请求，18/18 AI 隔离回归通过，390×844 与 320px 宽度检查正常。仅 `AI_RESPONSE_INVALID` 自动重试一次，共享每份草稿 45 秒期限；认证、限额和网络错误不自动重试。`doctor` 不发 API 请求，配置标记和结构通过仍不能代替未来草稿的人工核对。失败历史和验收范围见 [真实 AI 证据](docs/astropods-live-2026-11-11.md)及 [开发记录](docs/ai-readiness-2026-11-11.md)。公开仓库、许可证、干净克隆验证和实际视频仍待完成。
+Sonnet 4.6 的两组 CLI 检查及最终浏览器验收已通过；浏览器两次草稿操作实际使用三次网关请求，18/18 AI 隔离回归通过，390×844 与 320px 宽度检查正常。仅 `AI_RESPONSE_INVALID` 自动重试一次，共享每份草稿 45 秒期限；认证、限额和网络错误不自动重试。`doctor` 不发 API 请求，配置标记和结构通过仍不能代替未来草稿的人工核对。失败历史和验收范围见 [真实 AI 证据](docs/astropods-live-2026-11-11.md)及 [开发记录](docs/ai-readiness-2026-11-11.md)。候选提交已通过[独立克隆与运行检查](docs/clean-clone-2026-11-11.md)；公开仓库、许可证、最终公开版本验收、评委真实服务访问安排和实际视频仍待完成；开发者私有密钥不会随项目分发。

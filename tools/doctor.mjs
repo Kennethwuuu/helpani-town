@@ -17,7 +17,7 @@ const report = {
     ...(!runtimeReady ? ['Install Node.js 22.13 or newer.'] : []),
     ...(!dependenciesReady ? ['Run npm ci.'] : []),
     ...(!paypalConfigured() ? ['Configure Sandbox credentials in private .env to enable payments.'] : []),
-    ...(!ai.configured ? ['Follow docs/astropods-setup.md to obtain gateway access; local budget checks remain available.'] : ['Run npm run check:ai when ready to make two live gateway requests.']),
+    ...(!ai.configured ? ['Follow docs/astropods-setup.md to obtain gateway access; local budget checks remain available.'] : ['Run npm run check:ai when ready for two live draft operations (up to four Gateway requests with bounded format retries).']),
   ],
 };
 console.log(JSON.stringify(report, null, 2));

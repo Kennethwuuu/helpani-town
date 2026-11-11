@@ -4,21 +4,32 @@ Helpani Town connects a continuing virtual animal-care game with transparent way
 
 All organizations, activity attendance checks, project updates, and sponsor budgets in this prototype are fictional. Animal care, food, photographs, and medals are virtual. PayPal transactions use test funds. Access to a developer tool establishes technical access; organization partnerships, data permissions, and real funding arrangements remain to be validated.
 
-The delivery is still being prepared. The repository is currently private and an open-source LICENSE has not yet been supplied. The live Astropods CLI cases and final mobile-browser walkthrough have passed, along with 18/18 isolated AI regression tests. Clean-clone release verification and the final public video remain pending. The recorded validations below describe specific tested versions, rather than certifying every subsequent change. [Live AI evidence](astropods-live-2026-11-11.md)
+The delivery is still being prepared. The repository is currently private and an open-source LICENSE has not yet been supplied. The live Astropods CLI cases and final mobile-browser walkthrough have passed, along with 18/18 isolated AI regression tests. The private candidate passed a fresh-clone installation and browser smoke check without external-service credentials. Final public-release verification, provisioned integration access for judges, and the public video remain pending. [Clean-clone candidate evidence](clean-clone-2026-11-11.md) The recorded validations below describe specific tested versions, rather than certifying every subsequent change. Developer credentials are private and are not distributed with the project. [Live AI evidence](astropods-live-2026-11-11.md)
 
-From a clean clone with repository access, use Node.js **22.13 or newer** and npm. The current handoff build is on `codex/ai-draft-readiness`; `main` predates this AI-readiness work. In the repository root, switch to the handoff branch and run the following commands. Keep the terminal running while using the app.
+For a new checkout with repository access, use Node.js **22.13 or newer** and npm. The current handoff build is on `codex/ai-draft-readiness`; `main` predates this AI-readiness work. Clone that branch and run the following commands. Keep the terminal running while using the app.
 
 ```bash
-git switch codex/ai-draft-readiness
+git clone --branch codex/ai-draft-readiness https://github.com/Kennethwuuu/helpani-town.git
+cd helpani-town
 npm ci
 cp .env.example .env
 npm run doctor
 npm start
 ```
 
-Open [the local app](http://localhost:3000). The default `doctor` command checks local readiness without API calls. `npm start` loads the private `.env` file and creates `data/helpani.sqlite` on first use. Without payment or AI configuration, the game and simulated activities remain playable and the corresponding integration screens show a configuration message. Opening HTML files directly bypasses the HTTP server and its APIs.
+For an existing checkout, run `git switch codex/ai-draft-readiness` in the repository instead of the first two lines, then continue with installation. Preserve an existing private `.env` rather than overwriting it.
+
+Open [the local app](http://localhost:3000). The default `doctor` command checks local readiness without API calls. `npm start` loads the private `.env` file and creates `data/helpani.sqlite` on first use. Leave the payment and AI keys blank for the default local walkthrough: animal care, patrols, and simulated activities remain playable, while Sandbox checkout and model generation stay unconfigured. The source-based budget panel still works. Opening HTML files directly bypasses the HTTP server and its APIs.
 
 Keep one browser and one origin throughout the walkthrough. The default origin is `http://localhost:3000`, matching `PUBLIC_ORIGIN` in `.env`. If you change the host or port, update `PORT`, `HOST`, and `PUBLIC_ORIGIN` together and open that exact URL. `localhost` and `127.0.0.1` have separate cookies and photo storage. The server keeps progress in SQLite under a 30-day demo-session cookie. Photos use this browser's IndexedDB and can be downloaded as PNGs. Formal accounts and cross-device restoration are future pilot work. A private window starts a separate demo session and sponsor budget.
+
+If port 3000 is occupied, choose an unused local port and a new, nonexistent database path for an isolated run. For example:
+
+```bash
+HOST=127.0.0.1 PORT=3120 PUBLIC_ORIGIN=http://127.0.0.1:3120 DB_PATH=data/helpani-3120-new.sqlite npm start
+```
+
+Open `http://127.0.0.1:3120` for that run. The app creates the new SQLite file and preserves any previous database; reusing this path resumes its data. The command does not stop another local server.
 
 For PayPal, create or select a **Sandbox** app in the PayPal Developer Dashboard, then privately set `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`. Prepare a Sandbox personal buyer account to authorize checkout. Restart the server after configuration changes. The app creates and captures orders through its server, then shows the result on `/support`. A buyer can also cancel and return. Use the Sandbox app's credentials and keep credentials, access tokens, and buyer passwords out of the repository and recording. [PayPal Developer Dashboard](https://developer.paypal.com/dashboard/)
 
