@@ -70,16 +70,14 @@ npm test
 | --- | --- |
 | `ASTRO_GATEWAY_URL` | 平台提供的 HTTPS 网关主机地址。服务端会追加 `/v1/chat/completions`。 |
 | `ASTRO_GATEWAY_API_KEY` | AI Gateway 账户密钥。保存在服务端私有配置中。 |
-| `ASTRO_GATEWAY_MODEL` | 可选，其次使用运行环境的 `MODEL_DEFAULT`，最后默认 `claude-haiku-4-5`。 |
+| `ASTRO_GATEWAY_MODEL` | 可选，其次使用运行环境的 `MODEL_DEFAULT`，最后默认 `claude-sonnet-4-6`。 |
 
-从组织方演示台打开 `/project-draft`，勾选虚构资料。独立的资料预算核对通过服务端程序计算金额：完整资料下目标 US$100、物资 US$64、未分项 US$36；仅观察资料下显示预算缺失，不沿用旧金额。这部分不调用模型，也不修改付款或积分。
-
-网关配置后，Astropods 生成摘要、预算待确认建议和虚拟观察任务。页面区分程序金额核对与 AI 建议，显示请求模型、所选资料与任务引用，并保留人工复核标记。更换资料或请求失败会清除旧草稿。未配置时仍可核对预算，不能生成假 AI 结果。 [Astropods Chat Completions](https://docs.astropods.com/ai-gateway/chat) · [MVP 方案](docs/mvp.md)
+从组织方演示台打开 `/project-draft`，勾选虚构资料。服务端独立计算预算：完整资料为目标 US$100、物资 US$64、未分项 US$36，仅观察资料为未知金额；程序核对不调用模型、不修改付款或积分。Astropods 生成摘要、预算待确认建议和虚拟学习任务草稿，显示模型、来源和人工复核标记。更换资料或请求失败会清除旧草稿；草稿不会自动发布，提出的虚拟地图等交互仍待实现。 [Astropods Chat Completions](https://docs.astropods.com/ai-gateway/chat) · [MVP 方案](docs/mvp.md)
 
 ```bash
 npm run doctor    # 只检查本地运行与配置，不调用服务
 npm run test:ai   # 新增 AI 单元与 HTTP 测试，不调用外部服务
-npm run check:ai  # 显式发出两次实际网关请求；需要有效配置
+npm run check:ai  # 两次真实草稿操作；每份至多一次格式重试，共至多四次网关请求
 ```
 
-`doctor` 的已配置标记不代表凭据有效；`check:ai` 的结构通过也不代替对生成内容的人工核对。当前真实 AI 联调仍等待账户和网关权限。
+Sonnet 4.6 的两组 CLI 检查及最终浏览器验收已通过；浏览器两次草稿操作实际使用三次网关请求，18/18 AI 隔离回归通过，390×844 与 320px 宽度检查正常。仅 `AI_RESPONSE_INVALID` 自动重试一次，共享每份草稿 45 秒期限；认证、限额和网络错误不自动重试。`doctor` 不发 API 请求，配置标记和结构通过仍不能代替未来草稿的人工核对。失败历史和验收范围见 [真实 AI 证据](docs/astropods-live-2026-11-11.md)及 [开发记录](docs/ai-readiness-2026-11-11.md)。公开仓库、许可证、干净克隆验证和实际视频仍待完成。

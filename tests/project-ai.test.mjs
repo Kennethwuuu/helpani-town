@@ -108,7 +108,7 @@ test('budget and draft reject the same invalid source selections before configur
 });
 
 test('status exposes only safe readiness and model selection with the documented precedence', () => {
-  assert.deepEqual(projectAiStatus(), { configured: false, model: 'claude-haiku-4-5', issue: 'AI_NOT_CONFIGURED' });
+  assert.deepEqual(projectAiStatus(), { configured: false, model: 'claude-sonnet-4-6', issue: 'AI_NOT_CONFIGURED' });
   assert.equal(projectAiConfigured(), false);
   process.env.MODEL_DEFAULT = '  platform-model  ';
   assert.equal(projectAiStatus().model, 'platform-model');
@@ -162,7 +162,7 @@ test('generation sends only selected original sources to the host endpoint and r
   assert.equal(result.task.instructions, draft().task.instructions.trim());
   assert.deepEqual(result.task.sourceIds, ['observation-notes']);
   assert.deepEqual(result.budgetAudit, auditProjectBudget(['observation-notes']));
-  assert.deepEqual(result.generation, { provider: 'Astropods', model: 'platform-model' });
+  assert.deepEqual(result.generation, { provider: 'Astropods', model: 'platform-model', attempts: 1 });
   assert.equal(result.reviewRequired, true);
   assert.equal(JSON.stringify(result).includes(fakeKey), false);
 });
@@ -179,11 +179,84 @@ test('model-supplied budget fields and metadata cannot replace independently com
   assert.equal(result.reviewRequired, true);
 });
 
-test('upstream authentication, rate limits and other HTTP failures have distinct safe codes', async () => {
+test('generation accepts one complete JSON fence with the same schema and citation validation as plain JSON', async () => {
+  configure();
+  const content = JSON.stringify(draft());
+  const wrapped = [
+    '```json\n' + content + '\n```',
+    '```\n' + content + '\n```',
+    ' \n```json\r\n' + content + '\r\n``` \n',
+  ];
+  for (const fenced of wrapped) {
+    globalThis.fetch = async () => completion(fenced);
+    const result = await generateProjectDraft(['observation-notes']);
+    assert.equal(result.summary, draft().summary.trim());
+    assert.deepEqual(result.task.sourceIds, ['observation-notes']);
+    assert.deepEqual(result.budgetAudit, auditProjectBudget(['observation-notes']));
+    assert.equal(result.reviewRequired, true);
+  }
+  const wrongCitation = JSON.stringify(draft(['rescue-plan']));
+  globalThis.fetch = async () => completion('```json\n' + wrongCitation + '\n```');
+  await assert.rejects(generateProjectDraft(['observation-notes']), expectedError(502, 'AI_RESPONSE_INVALID'));
+});
+
+test('generation rejects commentary, incomplete fences and multiple fenced responses', async () => {
+  configure();
+  const content = JSON.stringify(draft());
+  const fenced = '```json\n' + content + '\n```';
+  for (const invalid of [
+    'Here is the draft:\n' + fenced,
+    fenced + '\nPlease review it.',
+    '```json\n' + content,
+    content + '\n```',
+    fenced + '\n' + fenced,
+    '```json\n' + content + '\n```\n```\n```',
+    '```javascript\n' + content + '\n```',
+  ]) {
+    globalThis.fetch = async () => completion(invalid);
+    await assert.rejects(generateProjectDraft(['observation-notes']), expectedError(502, 'AI_RESPONSE_INVALID'));
+  }
+});
+
+test('a token-limit completion is rejected even if its partial content happens to parse as a valid draft', async () => {
+  configure();
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    choices: [{ finish_reason: 'length', message: { content: JSON.stringify(draft()) } }],
+  }), { headers: { 'Content-Type': 'application/json' } });
+  await assert.rejects(generateProjectDraft(['observation-notes']), expectedError(502, 'AI_RESPONSE_INVALID'));
+});
+
+test('one invalid response gets one retry with the same sources and shared deadline', async () => {
+  configure();
+  const calls = [];
+  globalThis.fetch = async (_url, options) => {
+    calls.push({ payload: JSON.parse(options.body), signal: options.signal });
+    return completion(calls.length === 1 ? 'not valid JSON' : JSON.stringify(draft()));
+  };
+  const result = await generateProjectDraft(['observation-notes']);
+  assert.equal(calls.length, 2);
+  assert.equal(result.generation.attempts, 2);
+  assert.equal(calls[0].signal, calls[1].signal, 'retry must not restart the 45-second deadline');
+  for (const call of calls) assert.deepEqual(JSON.parse(call.payload.messages[1].content), [projectSources[2]]);
+  assert.equal(calls[1].payload.messages.length, 3);
+  assert.deepEqual(result.task.sourceIds, ['observation-notes']);
+});
+
+test('two invalid responses stop with a safe error rather than retrying indefinitely', async () => {
+  configure();
+  let calls = 0;
+  globalThis.fetch = async () => { calls += 1; return completion('not valid JSON'); };
+  await assert.rejects(generateProjectDraft(['observation-notes']), expectedError(502, 'AI_RESPONSE_INVALID'));
+  assert.equal(calls, 2);
+});
+
+test('upstream authentication, rate limits and other HTTP failures have distinct safe codes without retries', async () => {
   configure();
   for (const [status, expectedStatus, code] of [[401, 502, 'AI_AUTHENTICATION_FAILED'], [429, 503, 'AI_RATE_LIMITED'], [403, 502, 'AI_UNAVAILABLE'], [500, 502, 'AI_UNAVAILABLE'], [503, 502, 'AI_UNAVAILABLE']]) {
-    globalThis.fetch = async () => new Response(fakeKey, { status });
+    let calls = 0;
+    globalThis.fetch = async () => { calls += 1; return new Response(fakeKey, { status }); };
     await assert.rejects(generateProjectDraft(['observation-notes']), expectedError(expectedStatus, code));
+    assert.equal(calls, 1);
   }
 });
 

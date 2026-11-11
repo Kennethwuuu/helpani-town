@@ -2,7 +2,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { generateProjectDraft, projectAiStatus } from '../server/project-ai.mjs';
 
-// Explicit live check: two gateway requests. Never used by npm test or doctor.
+// Explicit live check: two drafts, each with at most one invalid-response retry.
+// Never used by npm test or doctor.
 const configuration = projectAiStatus();
 if (!configuration.configured) {
   console.error(JSON.stringify({ completed: false, code: configuration.issue, message: 'Astropods access is not configured. Follow docs/astropods-setup.md. No network requests were made.' }));
@@ -15,6 +16,12 @@ const cases = [
 ];
 const output = resolve('output/ai-smoke-latest.json');
 const report = { mode: 'live_configured_astropods_gateway', generatedAt: new Date().toISOString(), completed: false, contentReview: 'required', results: [] };
+const originalFetch = globalThis.fetch;
+let gatewayRequestsAttempted = 0;
+globalThis.fetch = (...args) => {
+  gatewayRequestsAttempted += 1;
+  return originalFetch(...args);
+};
 
 function redact(value) {
   let text = JSON.stringify(value, null, 2);
@@ -39,16 +46,20 @@ try {
     console.log(redact({ case: selected.name, structuralChecksPassed: true, generation: draft.generation, contentReview: 'required' }));
   }
   report.completed = true;
+  report.gatewayRequestsAttempted = gatewayRequestsAttempted;
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, redact(report) + '\n', { mode: 0o600 });
-  console.log(JSON.stringify({ completed: true, requestsCompleted: report.results.length, contentReview: 'required', output }));
+  console.log(JSON.stringify({ completed: true, requestsCompleted: report.results.length, gatewayRequestsAttempted, contentReview: 'required', output }));
 } catch (error) {
   report.completed = false;
+  report.gatewayRequestsAttempted = gatewayRequestsAttempted;
   report.failureCode = error.code || 'AI_CHECK_FAILED';
   try {
     await mkdir(dirname(output), { recursive: true });
     await writeFile(output, redact(report) + '\n', { mode: 0o600 });
   } catch { /* The terminal still reports failure when local evidence cannot be saved. */ }
-  console.error(JSON.stringify({ completed: false, requestsCompleted: report.results.length, code: error.code || 'AI_CHECK_FAILED', message: 'Live AI verification did not finish. Review the configuration or provider status; no generated content is claimed as verified.' }));
+  console.error(JSON.stringify({ completed: false, requestsCompleted: report.results.length, gatewayRequestsAttempted, code: error.code || 'AI_CHECK_FAILED', message: 'Live AI verification did not finish. Review the configuration or provider status; no generated content is claimed as verified.' }));
   process.exitCode = 1;
+} finally {
+  globalThis.fetch = originalFetch;
 }
