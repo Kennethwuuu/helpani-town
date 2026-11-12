@@ -1,5 +1,7 @@
 # VPS deployment evidence — 12 November 2026
 
+The current language release runs runtime commit `6f7c103aa00b8db7635225a93cc0f7405733fd66`; its 111-test Linux run, English/Chinese public checks and real English AI draft are recorded in [language release evidence](language-release-2026-11-12.md). The original deployment and payment evidence below describe the earlier source revision and remain historical evidence.
+
 **Status: HTTPS application, one real hosted AI draft, restart persistence, and the new-host USD 5 PayPal Sandbox flow passed.** The public site is [Helpani Town](https://vibecreating.tech). This record describes a deployment increment, not completion of all release gates.
 
 ## Host and deployed source

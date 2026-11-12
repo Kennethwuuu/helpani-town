@@ -13,7 +13,7 @@ The release adds English by default and a persistent English/Chinese selector on
 
 ## Validation
 
-The local isolated suite passes **110/110 tests**, including new real-HTTP language-asset/load-order checks and mocked default-English/Chinese/invalid-locale/retry tests. No model or PayPal request is made by that suite. Earlier sandbox-denied loopback runs were rerun with local network permission; those environment failures are not product failures.
+The local isolated suite passes **111/111 tests**, including new real-HTTP language-asset/load-order checks and mocked default-English/Chinese/invalid-locale/retry tests. No model or PayPal request is made by that suite. Earlier sandbox-denied loopback runs were rerun with local network permission; those environment failures are not product failures.
 
 The browser fixture `tools/browser/language-gate.js` passed:
 
@@ -29,4 +29,16 @@ Local artifacts `output/playwright/language-acceptance.json`, `language-en-care-
 
 MIT LICENSE, dependency/asset notices, English setup instructions, judge access instructions, and [publication hygiene evidence](publication-hygiene-2026-11-12.md) are included. The owner authorized public release and selected the existing Sandbox Personal buyer. The owner will enter buyer credentials in the event's private testing field using the local ignored handoff template; those credentials are absent from source and public docs.
 
-Final repository/default-branch and hosted checks are recorded in the release checklist after they are performed. The public English video, physical-iPhone acceptance, and private buyer-field entry remain separate delivery items; local browser checks do not certify them.
+Runtime commit **`6f7c103aa00b8db7635225a93cc0f7405733fd66`** was pushed to the candidate branch and default `main`. The repository is public; anonymous API access recognizes MIT, and a credential-free fresh clone of `main` matches that commit. Fresh `npm ci`, blank-key doctor and real-HTTP page/resource checks passed. The temporary checkout contains no private environment file.
+
+The existing VPS now runs `/opt/helpani-town/releases/6f7c103`. The uploaded archive SHA-256 was verified before extraction. The Linux Node 22.22.0 suite passes **111/111** before the atomic release switch. Loopback and public HTTPS health passed; database inode `662055`, private configuration metadata, and the existing OpenClaw processes were unchanged. No schema, credential, network or unrelated-service configuration changed.
+
+Public HTTPS checks passed for six routes and five language resources, with normal certificate validation; every hosted language resource matches the released source byte-for-byte. Local dynamic browser acceptance also passed greeting/feeding, patrol question and answer, English organizer search, simulated verification awarding 100 points, and language round trips.
+
+These final results close REL-01 and REL-02 in the release checklist. Later documentation-only commits preserve the tested runtime source. The public English video, physical-iPhone acceptance, and private buyer-field entry remain separate delivery items; local browser checks do not certify them.
+
+## English quotation correction
+
+The first hosted real draft retained a Chinese source title inside otherwise English task instructions. The final adapter explicitly requires translating source titles and quoted material into English and validates all user-facing fields for Han characters. A mixed-language response uses the existing single bounded format retry; a second failure remains an actionable error and never silently displays an unvalidated English draft. Source text, source IDs, source-derived budgets, the 45-second deadline and attempt charging are unchanged. A mocked regression covers correction, repeated failure, and Chinese-mode compatibility. Final local and Linux suites each pass 111/111.
+
+The corrected hosted real draft passed on `claude-sonnet-4-6` in **one Gateway attempt**. Summary, budget flags, task title, instructions and quoted source title were English; source citation was `observation-notes`, the source-derived budget remained unknown, and `reviewRequired` stayed true. Switching to Chinese cleared the draft and preserved the one selected source. Chinese preference survived a reload; the browser was returned to English. Evidence is the ignored `output/hosted-language-ai.json` and `output/playwright/language-hosted-ai-390.png`. This is one reviewed real response, not a guarantee of future provider availability.

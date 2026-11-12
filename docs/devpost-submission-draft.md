@@ -32,7 +32,7 @@ A limited pilot would validate one organization, authorized project materials, r
 
 ## Delivery links
 
-- Source repository: https://github.com/Kennethwuuu/helpani-town — MIT license and third-party notices supplied; see release checklist for final publication verification.
+- Source repository: https://github.com/Kennethwuuu/helpani-town — public default `main`, with MIT license and third-party notices; anonymous clone and setup verified.
 - Interface: English by default, with a persistent English/Chinese switch.
 - Test access: no app account or personal API key. The owner supplies the existing Sandbox Personal buyer only in the private judging field; see judge-access.md.
 - Working demo: [Helpani Town](https://vibecreating.tech). Hosted gameplay, AI, HTTPS, restart checks, and a reconciled USD 5 Sandbox buyer return passed. Final judge buyer access remains pending.

@@ -1,6 +1,6 @@
 # Helpani Town
 
-[Play the demo](https://vibecreating.tech) · [Judge walkthrough](docs/judges-guide.md) · [Judge access](docs/judge-access.md) · [MIT license](LICENSE) · [Third-party notices](THIRD_PARTY_NOTICES.md)
+[Play the demo](https://vibecreating.tech) · [Judge walkthrough](docs/judges-guide.md) · [Judge access](docs/judge-access.md) · [MIT license](LICENSE) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Release evidence](docs/language-release-2026-11-12.md)
 
 A virtual wildlife-care town with species-specific habitats, stories, learning patrols, and photos. Simulated activities earn charity points for fictional sponsor reservations. Astropods drafts source-grounded organizer tasks for human review; PayPal Sandbox demonstrates optional test contributions. Organizations, budgets, activity verification, and rescue updates are fictional. Virtual growth, payment confirmation, procurement, delivery, and rescue outcomes are recorded separately.
 
