@@ -167,6 +167,48 @@ test('generation sends only selected original sources to the host endpoint and r
   assert.equal(JSON.stringify(result).includes(fakeKey), false);
 });
 
+test('draft language defaults to English and keeps the requested language on a format retry', async () => {
+  configure();
+  for (const locale of [undefined, 'en', 'zh-CN']) {
+    const calls = [];
+    const localized = locale === 'zh-CN' ? draft() : {
+      summary: 'The fictional observation notes describe light entering at two points.',
+      budgetFlags: ['The selected source does not provide budget information.'],
+      task: {
+        title: 'Read the light-entry notes',
+        instructions: 'Read the selected fictional notes and identify how many points of light are described.',
+        sourceIds: ['observation-notes'],
+      },
+    };
+    globalThis.fetch = async (_url, options) => {
+      calls.push(JSON.parse(options.body));
+      return completion(calls.length === 1 ? 'invalid JSON' : JSON.stringify(localized));
+    };
+    const result = await generateProjectDraft(['observation-notes'], locale === undefined ? undefined : { locale });
+    assert.equal(calls.length, 2, `${locale ?? 'default'} gets only the bounded format retry`);
+    for (const call of calls) {
+      const prompt = call.messages[0].content;
+      if (locale === 'zh-CN') {
+        assert.match(prompt, /所有面向用户的文字使用简体中文/);
+        assert.doesNotMatch(prompt, /Write all user-facing strings in English/);
+      } else {
+        assert.match(prompt, /Write all user-facing strings in English/);
+        assert.match(prompt, /Keep source IDs unchanged/);
+        assert.doesNotMatch(prompt, /所有面向用户的文字使用简体中文/);
+      }
+      assert.deepEqual(JSON.parse(call.messages[1].content), [projectSources[2]], 'changing output language must not change source evidence');
+    }
+    assert.equal(calls[0].messages.length, 2);
+    const retryPrompt = calls[1].messages[2].content;
+    if (locale === 'zh-CN') assert.match(retryPrompt, /使用简体中文/);
+    else assert.match(retryPrompt, /All user-facing strings must be in English/);
+    assert.equal(result.summary, localized.summary.trim());
+    assert.deepEqual(result.task.sourceIds, ['observation-notes']);
+    assert.deepEqual(result.budgetAudit, auditProjectBudget(['observation-notes']));
+    assert.equal(result.reviewRequired, true);
+  }
+});
+
 test('model-supplied budget fields and metadata cannot replace independently computed facts or review requirement', async () => {
   configure();
   const modelOutput = { ...draft(['supply-register']), budgetAudit: { targetCents: 999 }, generation: { provider: 'invented' }, reviewRequired: false };

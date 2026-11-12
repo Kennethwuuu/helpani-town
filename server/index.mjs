@@ -313,6 +313,8 @@ function acceptsPost(req) {
 
 function assetFor(path) {
   if (assets.has(path)) return assets.get(path);
+  if (/^\/i18n(?:-(?:town|woodland|organizer))?\.js$/.test(path)) return [`../public${path}`, 'text/javascript; charset=utf-8'];
+  if (path === '/i18n.css') return ['../public/i18n.css', 'text/css; charset=utf-8'];
   if (/^\/[a-zA-Z0-9_-]+\.svg$/.test(path)) return [`../public${path}`, 'image/svg+xml'];
 }
 
@@ -365,8 +367,10 @@ const server = createServer(async (req, res) => {
       return json(res, 200, auditProjectBudget(sourceIds));
     }
     if (req.method === 'POST' && path === '/api/project-draft') {
-      const { sourceIds } = (await readJson(req)) ?? {};
+      const { sourceIds, locale = 'en' } = (await readJson(req)) ?? {};
+      if (!['en', 'zh-CN'].includes(locale)) throw new RequestError(400, '请选择 English 或中文。');
       return json(res, 200, await aiDemoGate.run(sessionId, () => generateProjectDraft(sourceIds, {
+        locale,
         beforeGatewayRequest: () => aiDemoGate.consumeAttempt(sessionId),
       })));
     }

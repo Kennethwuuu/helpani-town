@@ -1,7 +1,12 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
+  <script src="/i18n.js?v=20261112-en"></script>
+  <script src="/i18n-town.js?v=20261112-en"></script>
+  <script src="/i18n-woodland.js?v=20261112-en"></script>
+  <script src="/i18n-organizer.js?v=20261112-en"></script>
+  <link rel="stylesheet" href="/i18n.css?v=20261112-en">
   <script>
     // File previews have no HTTP origin or game API. Use the npm start entrypoint.
     if (location.protocol === 'file:') {
@@ -24,6 +29,7 @@
     <div class="shell header-inner organizer-header">
       <a class="brand" href="/">动物救助小镇</a>
       <a class="button secondary organizer-back" href="/organizer">返回活动核验台</a>
+      <label class="language-picker" data-no-i18n><span class="language-caption">Language / 语言</span><select data-language-select aria-label="Language / 语言"><option value="en" lang="en">English</option><option value="zh-CN" lang="zh-CN">中文</option></select></label>
     </div>
   </header>
   <main class="shell" id="draft-main">

@@ -28,7 +28,7 @@ Use case: stylized-concept. Asset type: a single collectible woodland conservati
 Subject: The central motif is the recognizable rust-orange and cream ringed fluffy tail of a red panda resting softly across a sturdy tree branch with a few green leaves. The tail is naturally draped, not gripping the branch. The red panda body and face are not shown. Broad elegant silhouette, forest canopy feeling.
 ```
 
-原始文件：`/Users/chenyidan/.codex/generated_images/01a1bf71-75a4-70a3-87b0-4f2fbf1d574c/exec-cc3a7d67-09c3-41e5-9a65-a0c893fc0432.png`。
+原始文件：`[local artifact path omitted]`。
 
 ### 雨后寻踪者
 
@@ -36,7 +36,7 @@ Subject: The central motif is the recognizable rust-orange and cream ringed fluf
 Subject: The central motif is one simple woodland animal paw print impressed in a soft forest-green shape, accompanied by a single small blue-green rain droplet and two warm autumn leaves, arranged as a balanced, legible miniature scene. Rain-after-walk discovery feeling. Clear paw pad silhouette with four small toes, no animal body.
 ```
 
-原始文件：`/Users/chenyidan/.codex/generated_images/01a1bf71-75a4-70a3-87b0-4f2fbf1d574c/exec-c217b84a-cf34-42f9-a6a8-f0e785cdd15d.png`。
+原始文件：`[local artifact path omitted]`。
 
 ### 林缘小匠
 
@@ -44,7 +44,7 @@ Subject: The central motif is one simple woodland animal paw print impressed in 
 Subject: The central motif is a small sturdy wooden footbridge made of warm ochre wood planks and short rounded rails, crossing a tiny leafy forest gap, with a few stylized bamboo leaves framing the upper side. Charming woodland craftsmanship feeling. The bridge is bold and legible, with only a few visible planks, no tiny buildings or people.
 ```
 
-原始文件：`/Users/chenyidan/.codex/generated_images/01a1bf71-75a4-70a3-87b0-4f2fbf1d574c/exec-4fcc28b3-3c83-4738-aaf4-419a0abd149e.png`。
+原始文件：`[local artifact path omitted]`。
 
 ## 使用范围
 

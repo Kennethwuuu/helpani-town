@@ -14,25 +14,27 @@
 
 ## 五步实际体验与证据
 
+下方截图采用可移植的仓库相对路径；原始截图保存在被 Git 忽略的本地 `output/` 目录，未随公开仓库分发。
+
 截图均为本次浏览器实际捕获的 506 × 687 视口，保留原始画面。前三级截图来自独立浏览器来源下的新试玩进度；后两级使用独立临时数据库检查定向领取，保留原有 localhost 试玩进度。
 
 ### 1 · 题目：基本清楚，互动题材可继续加强
 
 情境与三个选项清楚，按钮有足够的垂直间隔。当前主要互动是阅读后点选，动物的动作与答题内容之间还可以通过观察片段或小演示加强联系。
 
-![01 题目与选项](/Users/chenyidan/Documents/ChatGPT/helpani.town/output/design-audit/2026-11-09-quiz/01-question.jpg)
+![01 题目与选项](../output/design-audit/2026-11-09-quiz/01-question.jpg)
 
 ### 2 · 答错：解释完整，结果性质和后续动作仍可更明确
 
 结果显示“原来如此”“又认识了一点”、自己的猜测、正确结论、解释、来源和回林地提示。温和语气适合当前游戏，但同样的浅绿色结果卡弱化了本次没有猜中的信息；小号灰字也让错误选项与正确结论的对应关系不够突出。
 
-![02 答错反馈](/Users/chenyidan/Documents/ChatGPT/helpani.town/output/design-audit/2026-11-09-quiz/02-wrong-answer.jpg)
+![02 答错反馈](../output/design-audit/2026-11-09-quiz/02-wrong-answer.jpg)
 
 ### 3 · 答对：判定可读，确定的成长反馈不足
 
 “这条线索猜中了”能说明结果，但主要内容仍是题目与解释。本次即使额外获得勋章，结果页也只说“一枚勋章”，没有直接展示名称、图案、用途或使用入口。界面没有突出首次掌握了哪一页、距离下个目标还差多少。
 
-![03 答对并额外获得勋章](/Users/chenyidan/Documents/ChatGPT/helpani.town/output/design-audit/2026-11-09-quiz/03-correct-answer.jpg)
+![03 答对并额外获得勋章](../output/design-audit/2026-11-09-quiz/03-correct-answer.jpg)
 
 ### 4 · 定向领取：能选择，选择价值不清楚
 
@@ -40,13 +42,13 @@
 
 本次还看到领取按钮有可见的键盘焦点描边，是可以保留的优点。
 
-![04 选择一枚收藏](/Users/chenyidan/Documents/ChatGPT/helpani.town/output/design-audit/2026-11-09-quiz/04-medal-choice.jpg)
+![04 选择一枚收藏](../output/design-audit/2026-11-09-quiz/04-medal-choice.jpg)
 
 ### 5 · 领取成功：状态更新，获得感较弱
 
 点击“树梢倾听者”后，数量从 1/3 到 2/3，列表增加一个名称，领取按钮消失，并显示下次门槛。成功消息位于上方巡护状态区；当前领取视口里没有独立展示和可执行的新用途。体验止于收藏数量变化。
 
-![05 领取后的状态](/Users/chenyidan/Documents/ChatGPT/helpani.town/output/design-audit/2026-11-09-quiz/05-medal-claimed.jpg)
+![05 领取后的状态](../output/design-audit/2026-11-09-quiz/05-medal-claimed.jpg)
 
 ## 问答反馈：判定、解释、成长和下一步
 

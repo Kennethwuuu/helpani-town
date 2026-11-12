@@ -79,7 +79,7 @@ function renderHabitat() {
   if (!habitat.observations.length) { const li = document.createElement('li'); li.textContent = '安静观察，伙伴的新日常会记在这里。'; list.append(li); }
   for (const observation of habitat.observations) {
     const li = document.createElement('li'); const title = document.createElement('strong'); title.textContent = labels[observation.behavior] || observation.title || observation.behavior;
-    const small = document.createElement('small'); small.textContent = `${new Date(observation.at || observation.createdAt || Date.now()).toLocaleDateString('zh-CN')} · 共同经历`; li.append(title, small); list.append(li);
+    const small = document.createElement('small'); small.textContent = `${new Date(observation.at || observation.createdAt || Date.now()).toLocaleDateString(window.HelpaniI18n.locale)} · 共同经历`; li.append(title, small); list.append(li);
   }
   if (locallyApplied && habitat.layoutVersion !== habitat.appliedVersion) enqueueAutomatic('apply', {layoutVersion: habitat.layoutVersion});
 }
@@ -229,7 +229,7 @@ function beginPlacement(selected) {
 $('wood-edit').onclick = () => beginPlacement(facility);
 $('wood-platform').onclick = () => beginPlacement(meta().facility);
 $('wood-bridge').onclick = () => beginPlacement('woodland-bridge');
-document.querySelectorAll('[data-slot]').forEach((button) => { button.onclick = () => { slot = button.dataset.slot; document.querySelectorAll('[data-slot]').forEach((other) => other.setAttribute('aria-pressed',other === button)); scene?.resetCamera(); scene?.setPreview(slot, facility); woodlandCard.scrollIntoView({block:'start',behavior:'instant'}); $('wood-confirm').disabled = false; $('wood-placement-label').textContent = `正在预览：${button.querySelector('strong').textContent}。确认后保存。`; }; });
+document.querySelectorAll('[data-slot]').forEach((button) => { button.onclick = () => { slot = button.dataset.slot; document.querySelectorAll('[data-slot]').forEach((other) => other.setAttribute('aria-pressed',other === button)); scene?.resetCamera(); scene?.setPreview(slot, facility); woodlandCard.scrollIntoView({block:'start',behavior:'instant'}); $('wood-confirm').disabled = false; $('wood-placement-label').textContent = `正在预览：${window.HelpaniI18n.sourceText(button.querySelector('strong'))}。确认后保存。`; }; });
 function endPlacement() { slot = null; scene?.setPreview(null); $('wood-placement').hidden = true; $('wood-edit').hidden = false; woodlandCard.classList.remove('is-placing'); placementHome.insertBefore($('wood-placement'), $('wood-edit')); }
 $('wood-cancel').onclick = endPlacement;
 $('wood-confirm').onclick = async () => {
@@ -309,7 +309,7 @@ async function buildCrop() {
   const canvas = document.createElement('canvas'); canvas.width = 1600; canvas.height = 1000; const ctx = canvas.getContext('2d');
   ctx.drawImage(frame, (frame.width - width) * cropX, (frame.height - height) * cropY, width, height, 0, 0, 1600, 1000);
   const gradient = ctx.createLinearGradient(0,870,0,1000); gradient.addColorStop(0,'#142f2600'); gradient.addColorStop(1,'#142f26dc'); ctx.fillStyle=gradient; ctx.fillRect(0,870,1600,130);
-  ctx.fillStyle='#fff5dd'; ctx.font='500 24px sans-serif'; ctx.fillText(`${careSpecies[targetPhoto.species||'red-panda'].animal} · ${careSpecies[targetPhoto.species||'red-panda'].name}`,48,954); ctx.font='21px sans-serif'; ctx.textAlign='right'; ctx.fillText('小镇影像 · 虚拟场景',1552,954);
+  ctx.fillStyle='#fff5dd'; ctx.font='500 24px sans-serif'; ctx.fillText(window.HelpaniI18n.t(`${careSpecies[targetPhoto.species||'red-panda'].animal} · ${careSpecies[targetPhoto.species||'red-panda'].name}`),48,954); ctx.font='21px sans-serif'; ctx.textAlign='right'; ctx.fillText(window.HelpaniI18n.t('小镇影像 · 虚拟场景'),1552,954);
   await paintPhotoMedal(ctx, targetPhoto.medal, 1600, 1000);
   const blob = await new Promise((resolve,reject) => canvas.toBlob((value) => value ? resolve(value) : reject(new Error('图片生成失败，请重试。')), 'image/png'));
   if (generation !== cropGeneration || photo !== targetPhoto) return;
@@ -355,7 +355,7 @@ $('wood-photo-save').onclick = async () => {
     $('wood-photo-message').textContent=`保存失败，预览仍保留：${error.message}`; $('wood-photo-save').disabled=false;
   } finally { target.saving=false; if(photo===target) { syncPhotoControls(); renderPhotoMedals(); } }
 };
-$('wood-photo-download').onclick = async () => { await cropPending; if (!photo?.blob || !photo.ready || photoAccentBusy) return; const a=document.createElement('a'); a.href=photoURL; a.download=`Helpani-${careSpecies[photo.species||'red-panda'].name}-${photo.createdAt.replace(/[:.]/g,'-')}.png`; document.body.append(a); a.click(); a.remove(); };
+$('wood-photo-download').onclick = async () => { await cropPending; if (!photo?.blob || !photo.ready || photoAccentBusy) return; const a=document.createElement('a'); a.href=photoURL; a.download=`Helpani-${window.HelpaniI18n.t(careSpecies[photo.species||'red-panda'].name)}-${photo.createdAt.replace(/[:.]/g,'-')}.png`; document.body.append(a); a.click(); a.remove(); };
 $('wood-photo-close').onclick = () => photoDialog.close();
 $('wood-photo-retake').onclick = () => photoDialog.close();
 let albumGeneration=0;
@@ -365,7 +365,7 @@ $('wood-album').onclick = async () => {
   const dialog=$('wood-album-dialog'), grid=$('wood-album-grid'); grid.replaceChildren(); dialog.showModal();
   try {
     await openAlbum(); const photos=await listPhotos(); if(generation!==albumGeneration || !dialog.open)return; if (!photos.length) { const p=document.createElement('p'); p.textContent='还没有照片。打开相机，留下第一个喜欢的瞬间。'; grid.append(p); }
-    for (const saved of photos) { const button=document.createElement('button'), img=document.createElement('img'), label=document.createElement('span'); const url=URL.createObjectURL(saved.blob); img.src=url; img.alt=`${careSpecies[saved.species||'red-panda'].name}的栖地照片`; label.textContent=careSpecies[saved.species||'red-panda'].animal+' · '+new Date(saved.createdAt).toLocaleString('zh-CN')+(saved.medal?` · ${saved.medal.title}`:''); button.append(img,label); grid.append(button); button.onclick=() => { cropGeneration++; cropPending=Promise.resolve(); photo={...saved,saved:true,ready:true}; $('wood-photo-title').textContent=careSpecies[saved.species||'red-panda'].place+'留影'; $('wood-photo-preview').alt=careSpecies[saved.species||'red-panda'].animal+'的栖地照片'; sourceFrame=null; showBlob(saved.blob); $('wood-crop-label').hidden=true; $('wood-photo-retake').hidden=true; $('wood-photo-save').disabled=true; $('wood-photo-download').disabled=false; $('wood-photo-save').textContent='已保存'; $('wood-photo-message').textContent=label.textContent; renderPhotoMedals(); photoDialog.showModal(); }; dialog.addEventListener('close',()=>URL.revokeObjectURL(url),{once:true}); }
+    for (const saved of photos) { const button=document.createElement('button'), img=document.createElement('img'), label=document.createElement('span'); const url=URL.createObjectURL(saved.blob); img.src=url; img.alt=`${careSpecies[saved.species||'red-panda'].name}的栖地照片`; label.textContent=careSpecies[saved.species||'red-panda'].animal+' · '+new Date(saved.createdAt).toLocaleString(window.HelpaniI18n.locale)+(saved.medal?` · ${saved.medal.title}`:''); button.append(img,label); grid.append(button); button.onclick=() => { cropGeneration++; cropPending=Promise.resolve(); photo={...saved,saved:true,ready:true}; $('wood-photo-title').textContent=careSpecies[saved.species||'red-panda'].place+'留影'; $('wood-photo-preview').alt=careSpecies[saved.species||'red-panda'].animal+'的栖地照片'; sourceFrame=null; showBlob(saved.blob); $('wood-crop-label').hidden=true; $('wood-photo-retake').hidden=true; $('wood-photo-save').disabled=true; $('wood-photo-download').disabled=false; $('wood-photo-save').textContent='已保存'; $('wood-photo-message').textContent=window.HelpaniI18n.sourceText(label); renderPhotoMedals(); photoDialog.showModal(); }; dialog.addEventListener('close',()=>URL.revokeObjectURL(url),{once:true}); }
   } catch (error) { grid.textContent=`相册暂时无法读取：${error.message}`; }
 };
 $('wood-album-close').onclick = () => $('wood-album-dialog').close();

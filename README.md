@@ -1,4 +1,29 @@
-# Helpani Town 动物救助小镇
+# Helpani Town
+
+[Play the demo](https://vibecreating.tech) · [Judge walkthrough](docs/judges-guide.md) · [Judge access](docs/judge-access.md) · [MIT license](LICENSE) · [Third-party notices](THIRD_PARTY_NOTICES.md)
+
+A virtual wildlife-care town with species-specific habitats, stories, learning patrols, and photos. Simulated activities earn charity points for fictional sponsor reservations. Astropods drafts source-grounded organizer tasks for human review; PayPal Sandbox demonstrates optional test contributions. Organizations, budgets, activity verification, and rescue updates are fictional. Virtual growth, payment confirmation, procurement, delivery, and rescue outcomes are recorded separately.
+
+The website defaults to **English**. Use **Language / 语言** in the header to switch between English and Chinese. The browser remembers the choice across pages and reloads. AI drafts use the selected language, and new photos use translated labels.
+
+The hosted demo requires **no app account, installation, personal API key, or real payment**. Optional checkout uses an existing Sandbox Personal buyer whose credentials the owner supplies only through the event's private judging field. [Access arrangement and private handoff](docs/judge-access.md)
+
+Run locally with **Node.js 22.13+** and npm:
+
+```bash
+git clone https://github.com/Kennethwuuu/helpani-town.git
+cd helpani-town
+npm ci
+cp .env.example .env
+npm run doctor
+npm start
+```
+
+Open [localhost:3000](http://localhost:3000). Keep the terminal running. Blank keys allow gameplay and local budget checking; optional Sandbox checkout and model generation need private server configuration. Preserve an existing `.env`. Progress is stored in SQLite under a browser demo session; photos remain in that browser's IndexedDB. `npm test` uses isolated databases and mocked upstream services.
+
+Original project source is available under the [MIT License](LICENSE), with dependency, generated-image and reference provenance in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Private keys, player databases, buyer credentials, raw browser logs, and local evidence output are excluded from the repository. [Publication hygiene record](docs/publication-hygiene-2026-11-12.md)
+
+## 中文开发说明
 
 [线上试玩](https://vibecreating.tech) · [English judge guide](docs/judges-guide.md) · [English demo script](docs/demo-script-en.md) · [Server deployment guide](docs/deploy-existing-server.md)
 
@@ -19,10 +44,10 @@
 
 ## 本地运行
 
-需要 Node.js 22.13 或更高版本。SQLite 随 Node 提供，`npm ci` 会安装组织方演示台使用的 AG Grid Community。当前交接版本在 `codex/ai-draft-readiness`，`main` 仍为较早版本；克隆私有仓库需要现有访问权限。
+需要 Node.js 22.13 或更高版本。SQLite 随 Node 提供，`npm ci` 会安装组织方演示台使用的 AG Grid Community。发布版以默认分支 `main` 为准。
 
 ```bash
-git clone --branch codex/ai-draft-readiness https://github.com/Kennethwuuu/helpani-town.git
+git clone https://github.com/Kennethwuuu/helpani-town.git
 cd helpani-town
 npm ci
 cp .env.example .env
@@ -30,7 +55,7 @@ npm run doctor
 npm start
 ```
 
-已有本地仓库时，在仓库目录执行 `git switch codex/ai-draft-readiness` 替代前两行，再继续安装；已有私有 `.env` 时保留其内容。默认不填 PayPal 和 AI 密钥也能体验动物照顾、巡护及模拟活动；沙箱支付和 AI 生成保持未配置状态，资料预算核对仍可使用。`doctor` 不调用外部服务。
+已有本地仓库时，在仓库目录执行 `git switch main` 并拉取更新，再继续安装；已有私有 `.env` 时保留其内容。默认不填 PayPal 和 AI 密钥也能体验动物照顾、巡护及模拟活动；沙箱支付和 AI 生成保持未配置状态，资料预算核对仍可使用。`doctor` 不调用外部服务。
 
 在浏览器打开 `http://localhost:3000`。请先启动服务；直接预览 `public/*.html` 会跳到默认服务地址，游戏资源和 API 需要通过 HTTP 加载。首次运行会创建 `data/helpani.sqlite`。小镇、布局、观察、巡护、演示账本和沙箱付款记录使用 SQLite 保存，按当前浏览器的演示会话隔离；会话 Cookie 保留 30 天，没有正式账号或跨设备恢复。无痕窗口可体验新的演示会话，每个会话使用独立的模拟预算。
 
@@ -96,4 +121,4 @@ npm run test:ai   # 新增 AI 单元与 HTTP 测试，不调用外部服务
 npm run check:ai  # 两次真实草稿操作；每份至多一次格式重试，共至多四次网关请求
 ```
 
-Sonnet 4.6 的两组 CLI 检查及最终浏览器验收已通过；浏览器两次草稿操作实际使用三次网关请求，18/18 AI 隔离回归通过，390×844 与 320px 宽度检查正常。仅 `AI_RESPONSE_INVALID` 自动重试一次，共享每份草稿 45 秒期限；认证、限额和网络错误不自动重试。`doctor` 不发 API 请求，配置标记和结构通过仍不能代替未来草稿的人工核对。失败历史和验收范围见 [真实 AI 证据](docs/astropods-live-2026-11-11.md)及 [开发记录](docs/ai-readiness-2026-11-11.md)。候选提交已通过[独立克隆与运行检查](docs/clean-clone-2026-11-11.md)；公开仓库、许可证、最终公开版本验收、评委真实服务访问安排和实际视频仍待完成；开发者私有密钥不会随项目分发。
+Sonnet 4.6 的两组 CLI 检查及最终浏览器验收已通过；浏览器两次草稿操作实际使用三次网关请求，18/18 AI 隔离回归通过，390×844 与 320px 宽度检查正常。仅 `AI_RESPONSE_INVALID` 自动重试一次，共享每份草稿 45 秒期限；认证、限额和网络错误不自动重试。`doctor` 不发 API 请求，配置标记和结构通过仍不能代替未来草稿的人工核对。失败历史和验收范围见 [真实 AI 证据](docs/astropods-live-2026-11-11.md)及 [开发记录](docs/ai-readiness-2026-11-11.md)。候选提交已通过[独立克隆与运行检查](docs/clean-clone-2026-11-11.md)；本次已补齐 MIT 许可证、第三方声明及中英文切换；仓库公开与默认分支验收见本次发布记录。评委使用现有 Sandbox 买家，由维护者填入赛事私密字段；视频仍单独待办。开发者私有密钥不会随项目分发。

@@ -1016,9 +1016,9 @@ controls.allocate.addEventListener('click', () => update('/api/sponsor/allocate'
   success: '已预留 US$2 演示赞助额度。支持记录已更新。',
 }));
 controls.supply.addEventListener('click', () => checkout({ kind: 'supply' }));
-element('daily-project-update').textContent = element('project-update-title').textContent;
-element('daily-project-meta').textContent = element('project-update-meta').textContent;
-element('daily-project-status').textContent = element('project-update-status').textContent;
+element('daily-project-update').textContent = window.HelpaniI18n.sourceText(element('project-update-title'));
+element('daily-project-meta').textContent = window.HelpaniI18n.sourceText(element('project-update-meta'));
+element('daily-project-status').textContent = window.HelpaniI18n.sourceText(element('project-update-status'));
 element('donation').addEventListener('submit', (event) => {
   event.preventDefault();
   const amountCents = Number(new FormData(event.currentTarget).get('amount'));

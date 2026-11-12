@@ -147,7 +147,7 @@ export class CompanionScene extends WoodlandScene {
     this.drawFeedback(ctx,frame);ctx.drawImage(this.foreground,0,0);
     if(preview&&frame.preview)this.drawPreview(ctx,frame.preview,frame.time,frame.species);
     ctx.restore();
-    if(watermark){ctx.save();ctx.scale(w/W,h/H);const gradient=ctx.createLinearGradient(0,870,0,1000);gradient.addColorStop(0,'#133e3300');gradient.addColorStop(1,'#113c35df');ctx.fillStyle=gradient;ctx.fillRect(0,870,W,130);ctx.fillStyle='#fff6dd';ctx.font='500 25px sans-serif';ctx.fillText(turtle?'绿海龟 · 阿潮':'中华穿山甲 · 小松',48,954);ctx.textAlign='right';ctx.font='21px sans-serif';ctx.fillText('小镇影像 · 虚拟场景',1552,954);ctx.restore();}
+    if(watermark){ctx.save();ctx.scale(w/W,h/H);const gradient=ctx.createLinearGradient(0,870,0,1000);gradient.addColorStop(0,'#133e3300');gradient.addColorStop(1,'#113c35df');ctx.fillStyle=gradient;ctx.fillRect(0,870,W,130);ctx.fillStyle='#fff6dd';ctx.font='500 25px sans-serif';ctx.fillText(window.HelpaniI18n.t(turtle?'绿海龟 · 阿潮':'中华穿山甲 · 小松'),48,954);ctx.textAlign='right';ctx.font='21px sans-serif';ctx.fillText(window.HelpaniI18n.t('小镇影像 · 虚拟场景'),1552,954);ctx.restore();}
   }
   drawBackground(ctx){
     const turtle=this.isTurtle,random=rng(turtle?16711:72318);

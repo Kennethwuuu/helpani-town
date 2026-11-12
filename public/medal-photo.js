@@ -31,10 +31,10 @@ export async function paintPhotoMedal(context, medal, width, height) {
   context.textAlign = 'center';
   context.fillStyle = '#284c37';
   context.font = '600 23px sans-serif';
-  context.fillText(medal.title, 117, 210);
+  context.fillText(window.HelpaniI18n.t(medal.title), 117, 210, 214);
   context.fillStyle = '#6c765c';
   context.font = '18px sans-serif';
-  context.fillText(medal.photoAccent, 117, 233);
+  context.fillText(window.HelpaniI18n.t(medal.photoAccent), 117, 233, 214);
   context.restore();
 }
 

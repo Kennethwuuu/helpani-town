@@ -1,0 +1,26 @@
+.language-picker { display:flex; align-items:center; gap:6px; flex-shrink:0; margin-left:auto; color:var(--muted, #536456); font-size:12px; }
+.language-picker select { min-height:36px; max-width:108px; padding:5px 9px; border:1px solid #cbd4c2; border-radius:8px; background:#fffdf5; color:#23372f; font:inherit; font-size:14px; cursor:pointer; }
+.language-picker select:focus-visible { outline:3px solid #b58a47; outline-offset:2px; }
+html[lang=en] .primary-nav a { white-space:nowrap; }
+html[lang=en] button, html[lang=en] .button { line-height:1.35; }
+html[lang=en] .wallet small { white-space:normal; line-height:1.4; }
+html[lang=en] .wallet { flex-shrink:0; }
+html[lang=en] .intro > div { min-width:0; }
+html[lang=en] .tag { white-space:normal; max-width:100%; }
+@media (max-width:760px) {
+  .header-inner { flex-wrap:wrap; }
+  .header .organizer-header { flex-wrap:wrap; }
+  .language-caption { display:none; }
+  .language-picker { margin-left:auto; }
+  html[lang=en] .header .demo-pill { display:none; }
+  .organizer-header .brand { flex:1 1 55%; }
+  .organizer-header .organizer-back { order:3; }
+  html[lang=en] .organizer-panel-heading { flex-wrap:wrap; }
+  html[lang=en] .organizer-filters label { min-width:0; max-width:100%; }
+  html[lang=en] .primary-nav { gap:4px; }
+}
+@media (max-width:420px) {
+  html[lang=en] .brand { font-size:16px; }
+  html[lang=en] .primary-nav a { font-size:12px; }
+  .language-picker select { min-height:38px; }
+}

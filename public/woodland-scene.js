@@ -377,8 +377,8 @@ export class WoodlandScene {
       ctx.save(); ctx.scale(w / WIDTH, h / HEIGHT);
       const gradient = ctx.createLinearGradient(0, 880, 0, 1000); gradient.addColorStop(0, '#102b2600'); gradient.addColorStop(1, '#102b26c9');
       ctx.fillStyle = gradient; ctx.fillRect(0, 880, WIDTH, 120);
-      ctx.fillStyle = '#fff9e9'; ctx.font = '500 27px "PingFang SC", sans-serif'; ctx.fillText('小熊猫 · 竹竹', 52, 950);
-      ctx.font = '21px "PingFang SC", sans-serif'; ctx.textAlign = 'right'; ctx.fillStyle = '#f2eedbcc'; ctx.fillText('小镇影像 · 虚拟场景', 1548, 950); ctx.restore();
+      ctx.fillStyle = '#fff9e9'; ctx.font = '500 27px "PingFang SC", sans-serif'; ctx.fillText(window.HelpaniI18n.t('小熊猫 · 竹竹'), 52, 950);
+      ctx.font = '21px "PingFang SC", sans-serif'; ctx.textAlign = 'right'; ctx.fillStyle = '#f2eedbcc'; ctx.fillText(window.HelpaniI18n.t('小镇影像 · 虚拟场景'), 1548, 950); ctx.restore();
     }
   }
 

@@ -1,19 +1,30 @@
 # Helpani Town — Judge's Guide
 
-Helpani Town connects a continuing virtual animal-care game with transparent ways to support wildlife projects. Players care for a green turtle, red panda, or Chinese pangolin, explore a species-specific learning trail, and choose whether to join an activity or support a project. Astropods helps an organizer turn selected project materials into a reviewable task draft. PayPal handles the Sandbox checkout.
+[Open the Web demo](https://vibecreating.tech) · [Source repository](https://github.com/Kennethwuuu/helpani-town) · [Access and Sandbox buyer arrangement](judge-access.md)
 
-All organizations, activity attendance checks, project updates, and sponsor budgets in this prototype are fictional. Animal care, food, photographs, and medals are virtual. PayPal transactions use test funds. Access to a developer tool establishes technical access; organization partnerships, data permissions, and real funding arrangements remain to be validated.
+Helpani Town connects a continuing virtual animal-care game with transparent ways to support wildlife projects. Players care for a green turtle, red panda, or Chinese pangolin, explore a species-specific learning trail, and choose whether to join an activity or support a project. Astropods helps an organizer turn selected materials into a reviewable task draft. PayPal handles Sandbox checkout.
 
-Open the [hosted Web demo](https://vibecreating.tech) to try the town without installing dependencies or supplying API keys. The hosted game, one real Astropods draft, HTTPS sessions, and progress/AI-counter persistence across an application restart have passed deployment checks. A USD 5 PayPal Sandbox contribution completed the new hostname's buyer return, with matching remote capture and server ledger; its record also survived an application restart. Sandbox checkout requires a Personal test-buyer account; the final private buyer-access arrangement for judges remains to be settled. [Hosted deployment evidence](vps-deployment-2026-11-12.md)
+The interface defaults to **English** and includes a **Language / 语言** switch in the header. The chosen language persists in the current browser across pages and reloads. Generated drafts follow the selected language; changing language retains source choices and asks for a new draft.
 
-Hosted AI access has a persistent allowance of 100 actual Gateway attempts across visitors, 10 per browser session, and one concurrent draft operation. A format retry consumes another attempt. These are lifetime counters without a timed reset, not cash sponsorship or a provider-dollar limit. Source viewing and budget calculation remain available when generation is busy or exhausted.
+Organizations, activities, attendance checks, budgets, and project updates are fictional. Animal care, food, photographs, and medals are virtual. PayPal uses test funds. Procurement, delivery, organization partnerships, data permissions, and actual rescue outcomes are separate from this prototype's payment and game records.
 
-The repository is currently private and an open-source LICENSE has not yet been supplied. Final public-release verification and the public English video remain pending. The earlier private candidate passed fresh-clone installation and a blank-key browser check. Developer credentials are held privately on the application server and are not distributed in the repository or judge materials. The recorded validations describe specific tested versions. [Clean-clone candidate evidence](clean-clone-2026-11-11.md) · [Earlier live AI evidence](astropods-live-2026-11-11.md)
+## Five-minute walkthrough
 
-For a new checkout with repository access, use Node.js **22.13 or newer** and npm. The current handoff build is on `codex/ai-draft-readiness`; `main` predates this AI-readiness work. Clone that branch and run the following commands. Keep the terminal running while using the app.
+1. On `/`, choose **Green turtle**, **Red panda**, or **Chinese pangolin**. Say hello, then feed the animal. Welcoming it gives one virtual food; feeding consumes one food and adds 10 game XP. Care stories unlock at 1, 3, 5 and 6 feedings. **Advance demo day** allows a demonstration of later visits.
+2. Explore the care area's habitat layout, camera, and patrol. Roll the die, answer a question, and read the explanation and source. Each species has eight trail cells, six questions, knowledge records, and virtual rewards. Care-story and patrol-story progress are separate.
+3. Open `/activities` and simulate signup for **Wetland cleanup**. Open **Organizer demo** (`/organizer`), search for the activity, and simulate verification. Return to Activities and refresh to see 100 charity points. Attendance verification is a fictional organizer action.
+4. Open `/support` and reserve USD 2 of the fictional sponsor budget using 100 points. This is a simulated reservation, not a real payout. The alternative use of the same points is 50 points for one virtual food.
+5. Open `/project-draft`. Select all three fictional sources and generate a draft. The source-derived budget is USD 100 target, eight items at USD 8 totaling USD 64, and USD 36 awaiting details. Select only **Observation area notes** and generate again: the old draft clears and the budget becomes unknown. Follow the task citation and compare the generated claims against the selected source. Budget arithmetic is deterministic; summaries and task suggestions come from the model and require human review.
+6. Optionally test PayPal Sandbox on `/support`. Use the existing Personal buyer supplied in the event's private judging instructions. The USD 8 material option records a test payment for one shade-care cloth; **Material awaiting purchase (demo)** does not establish shipment, receipt, or rescue results. [Buyer-access details](judge-access.md)
+
+Hosted AI access uses the maintainer's server credentials. It permits 100 actual Gateway attempts globally, 10 per demo session, and one concurrent draft operation. Failed attempts and the bounded format retry consume capacity; counters have no timed reset. Source viewing and budget calculation remain usable when generation is unavailable.
+
+## Run from source
+
+Use Node.js **22.13 or newer** and npm. The release source is MIT-licensed; dependency and asset provenance are in [Third-party notices](../THIRD_PARTY_NOTICES.md).
 
 ```bash
-git clone --branch codex/ai-draft-readiness https://github.com/Kennethwuuu/helpani-town.git
+git clone https://github.com/Kennethwuuu/helpani-town.git
 cd helpani-town
 npm ci
 cp .env.example .env
@@ -21,83 +32,16 @@ npm run doctor
 npm start
 ```
 
-For an existing checkout, run `git switch codex/ai-draft-readiness` in the repository instead of the first two lines, then continue with installation. Preserve an existing private `.env` rather than overwriting it.
+Open [localhost:3000](http://localhost:3000) and keep the terminal running. Do not open the HTML files directly. The app creates `data/helpani.sqlite`. Blank service keys leave animal care, patrols, and simulated activities playable; real model generation and Sandbox checkout require private server configuration. Preserve an existing `.env` rather than overwriting it.
 
-Open [the local app](http://localhost:3000). The default `doctor` command checks local readiness without API calls. `npm start` loads the private `.env` file and creates `data/helpani.sqlite` on first use. Leave the payment and AI keys blank for the default local walkthrough: animal care, patrols, and simulated activities remain playable, while Sandbox checkout and model generation stay unconfigured. The source-based budget panel still works. Opening HTML files directly bypasses the HTTP server and its APIs.
-
-Keep one browser and one origin throughout the walkthrough. The default origin is `http://localhost:3000`, matching `PUBLIC_ORIGIN` in `.env`. If you change the host or port, update `PORT`, `HOST`, and `PUBLIC_ORIGIN` together and open that exact URL. `localhost` and `127.0.0.1` have separate cookies and photo storage. The server keeps progress in SQLite under a 30-day demo-session cookie. Photos use this browser's IndexedDB and can be downloaded as PNGs. Formal accounts and cross-device restoration are future pilot work. A private window starts a separate demo session and sponsor budget.
-
-If port 3000 is occupied, choose an unused local port and a new, nonexistent database path for an isolated run. For example:
+If port 3000 is occupied, use a separate database and matching origin:
 
 ```bash
 HOST=127.0.0.1 PORT=3120 PUBLIC_ORIGIN=http://127.0.0.1:3120 DB_PATH=data/helpani-3120-new.sqlite npm start
 ```
 
-Open `http://127.0.0.1:3120` for that run. The app creates the new SQLite file and preserves any previous database; reusing this path resumes its data. The command does not stop another local server.
+`localhost` and `127.0.0.1` have separate cookies and photo storage. Progress uses a 30-day browser demo-session cookie; photos use IndexedDB. Formal accounts and cross-device restoration are future work.
 
-For PayPal, create or select a **Sandbox** app in the PayPal Developer Dashboard, then privately set `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`. Prepare a Sandbox personal buyer account to authorize checkout. Restart the server after configuration changes. The app creates and captures orders through its server, then shows the result on `/support`. A buyer can also cancel and return. Use the Sandbox app's credentials and keep credentials, access tokens, and buyer passwords out of the repository and recording. [PayPal Developer Dashboard](https://developer.paypal.com/dashboard/)
+Maintainers configuring services can follow [Astropods setup](astropods-setup.md), [server operation](deploy-existing-server.md), and `.env.example`. The default doctor command makes no API requests. `npm run check:ai` explicitly performs two live drafts with up to four Gateway attempts and can consume provider usage. Judges using the hosted app do not need these credentials or setup steps.
 
-For Astropods, obtain permitted gateway access through your account and use the official account-key API to create a Gateway key for this standalone Node service. Key creation requires authorized account access and works without Docker. Keep the returned key and platform-provided gateway origin in the private `.env` file. The CLI's login OAuth token authorizes platform management requests; model requests use the Gateway key. An optional agent workflow declares `models.default.provider: gateway` and uses `ast login` plus `ast project` to inject gateway variables into a Docker-based local agent runtime. Account and key setup still need a successful model request to establish live generation. [Account Gateway key API](https://docs.astropods.com/api-reference/astropods-api/ai-gateway/create-an-ai-gateway-account-key) · [Astropods event resources](https://paypalaihackathon.devpost.com/details/astropods) · [Astropods AI Gateway setup](https://docs.astropods.com/ai-gateway)
-
-Once access is provisioned, set these variables privately and restart the app.
-
-| Variable | Meaning |
-| --- | --- |
-| `ASTRO_GATEWAY_URL` | The platform-provided HTTPS gateway **origin only**, such as `https://YOUR-GATEWAY-HOST`. Omit `/v1`, query parameters, and embedded credentials. The adapter adds `/v1/chat/completions`. |
-| `ASTRO_GATEWAY_API_KEY` | The permitted gateway key. The CLI's platform-login OAuth token serves a different purpose. |
-| `ASTRO_GATEWAY_MODEL` | Optional model override. A runtime-provided `MODEL_DEFAULT` can supply the selected gateway model; the fallback is `claude-sonnet-4-6`. |
-
-The explicit command below performs **two live draft operations**, with up to **four Gateway requests** when each draft uses its one bounded format retry. Only `AI_RESPONSE_INVALID` permits that retry; both attempts share a 45-second deadline. Authentication, quota, and network failures are not retried automatically. The returned `generation.attempts` records one or two attempts per successful draft. The command can consume provider usage. Run it after Gateway access is configured; the default `doctor` command makes no API calls. A configured status alone confirms the local configuration shape. The final browser comparison used three Gateway requests across its two operations, and the retry regression passed. [Chat Completions API](https://docs.astropods.com/ai-gateway/chat) · [Gateway errors and limits](https://docs.astropods.com/ai-gateway/limits)
-
-```bash
-npm run check:ai
-```
-
-For a short judging walkthrough, follow this sequence.
-
-1. Open `/` and choose **绿海龟** (green turtle). Greet the virtual animal, then feed it once. The initial welcome gives one food, feeding consumes one food and adds 10 game XP. Open **故事** to see the first care chapter. The demo can advance the local game day with **切到次日（演示）**. Care chapters unlock at 1, 3, 5, and 6 feedings, with an explicit protection-medal claim after the final chapter.
-2. Return to the care area and open the patrol. Pick a theme, roll the die, and answer one question. Read the explanation and source. Each species has its own eight-cell trail, six questions, knowledge collection, and rewards. The care chapters and patrol chapters have separate progress. Habitat placement and photography can be explored from the same care area.
-3. Open `/activities` and select **模拟报名** for **湿地净滩**. Open **组织方演示台**, search for that activity, filter **待模拟核验**, and choose **模拟核验** on its row. Return to the player's activity page and refresh to see 100 charity points. This is a simulation of an organizer's approval.
-4. Open `/support` and use **用 100 分预留 US$2**. The charity balance becomes zero and this session's fictional budget moves from USD 10 to USD 8. The record represents a simulated reservation awaiting a future real funding arrangement. An alternative use of the same charity-point balance is 50 points for one virtual care food.
-5. From `/organizer`, open **救助资料 → 生成任务草稿**. At `/project-draft`, first select all three fictional sources and generate a draft. Review the source-derived budget figures separately from the model's suggestions. The budget target is USD 100; eight items at USD 8 total USD 64, with USD 36 still requiring detail and quotations. Then select only **观察区说明** and generate again. The previous output should clear and the budget should become unknown. Open the task citation to **观察区说明**, then compare the draft against the selected material. Both selections passed the final mobile-browser walkthrough; recording the English demonstration remains TODO.
-6. In `/support`, expand **为指定物资出资** and choose the USD 8 Sandbox checkout for one shade-care cloth. After buyer authorization and server capture, return to the support record. **物资待采购（演示）** means the material awaits purchasing. Payment confirmation, shipping, receipt, and rescue outcomes have separate evidence and states.
-
-The AI budget panel derives arithmetic from the selected source fields. The generated summary, review suggestions, and virtual task come from the model and require human review against the source text. Observation-only input has no supplied budget to calculate. Changing the selected sources clears the old draft. A failed generation keeps the source choices available for retry. A proposed virtual map locator is a draft instruction; this app does not implement that interaction. Drafts are displayed for organizer review; publishing a generated task is a later workflow.
-
-Use these labels to follow the Chinese UI during the English demonstration.
-
-| Chinese UI label | English meaning |
-| --- | --- |
-| 小镇 / 故事 / 活动 / 支持 | Town / Stories / Activities / Support |
-| 绿海龟 / 小熊猫 / 中华穿山甲 | Green turtle / Red panda / Chinese pangolin |
-| 照护粮 / 成长 XP | Virtual care food / Game growth XP |
-| 打招呼、轻抚 / 喂食 | Greet or gently interact / Feed the virtual animal |
-| 领取今日免费粮 | Claim today's free virtual food |
-| 切到次日（演示） | Advance the demo game day |
-| 保护勋章 / 领养下一只伙伴 | Protection medal / Welcome the next companion |
-| 布置栖地 / 确认 / 取消 | Arrange habitat / Confirm / Cancel |
-| 巡护 / 掷骰 / 知识册 | Patrol / Roll the die / Knowledge collection |
-| 拍照 / 相册 / 下载 | Take a photo / Photo album / Download |
-| 公益积分 / 模拟报名 | Charity points / Simulate activity signup |
-| 组织方演示台 / 待模拟核验 / 模拟核验 | Organizer demo / Awaiting simulated verification / Simulate verification |
-| 用 50 公益积分换 1 份照护粮 | Exchange 50 charity points for one virtual care food |
-| 用 100 分预留 US$2 / 演示额度已预留 | Reserve USD 2 using 100 points / Demo budget reserved |
-| 救助任务草稿 / 选择资料 / 生成任务草稿 | Rescue task draft / Select sources / Generate draft |
-| 资料摘要 / 预算待确认项 / 任务引用 | Source summary / Budget review suggestions / Task citations |
-| PayPal 沙箱捐助 / 为指定物资出资 | PayPal Sandbox contribution / Fund a specified material |
-| 前往 PayPal 沙箱 / 我的记录 | Continue to PayPal Sandbox / My records |
-| 物资待采购（演示） / 尚未确认送达或救助成果 | Material awaiting purchase, simulated / Delivery and rescue outcomes await evidence |
-
-The prototype records these quantities separately.
-
-| Record | Source and meaning |
-| --- | --- |
-| Game XP, food, care stories | Virtual care actions and progression. Patrol and habitat discoveries have their own records. |
-| Charity points | Simulated organizer-verified activity records. The player chooses between virtual food and a demo-budget reservation. |
-| Sponsor reservation | A per-session fictional USD 10 pool with a USD 2 reservation. Sponsor-funded payouts and operating funding await partner validation. |
-| PayPal Sandbox payment | A test order and server-confirmed capture. The supporter chooses a contribution or a specified-material purpose. |
-| Fulfillment and rescue evidence | Organization-reported purchase, shipment, receipt, and outcome records. Current records are explicitly fictional examples. |
-
-Recorded evidence available in the project includes a USD 5 Sandbox contribution with matching remote capture and local record, plus safe completed-callback replay. The later incremental run completed a USD 8 material contribution, cancellation and re-entry, and the AG Grid-to-player points workflow. The game UI test used Chrome touch emulation. Sonnet 4.6 passed the CLI source comparisons and final browser walkthrough, following documented failures. The browser made two draft operations and three Gateway requests, checked the source citation and source-change reset, and had no horizontal overflow at 390 × 844 or 320 px width. The final isolated AI regression passed 18/18; gameplay and PayPal were not rerun for this AI change. [USD 5 Sandbox evidence](paypal-sandbox-2026-11-11.md) · [USD 8, cancellation, and organizer UI evidence](qa-report-2026-11-11.md) · [Three-species gameplay evidence](species-patrol-2026-11-11.md) · [Live AI evidence](astropods-live-2026-11-11.md)
-
-Before delivery, check the release in a clean clone, publish an authorized public repository with an open-source LICENSE, and record a public English YouTube demo shorter than three minutes, including the live AI source comparison. Supply English translations for any additional submitted materials. Raw files referenced under `output/` are local QA artifacts and need a redacted delivery copy if used as public evidence. The hosted URL is supplied above. The final public repository/default-branch acceptance, submission URL, and video URL remain TODO.
+The [release checklist](release-checklist-2026-11-12.md) records remaining acceptance, including the public English video, private buyer-field handoff, and physical-iPhone checks. Earlier [hosted deployment evidence](vps-deployment-2026-11-12.md) describes its tested version, not automatic certification of every later release.

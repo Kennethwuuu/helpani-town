@@ -155,13 +155,13 @@ function initialize() {
     rowHeight: 47,
     animateRows: false,
     columnDefs: [
-      { field: 'title', headerName: '活动', flex: 2, minWidth: 135, tooltipField: 'title' },
-      { field: 'status', headerName: '核验状态', width: 105, cellClass: 'organizer-cell', cellRenderer: renderStatus, getQuickFilterText: () => '' },
-      { field: 'points', headerName: '核验积分', width: 100, valueFormatter: ({ value }) => `+${value}`, getQuickFilterText: () => '' },
+      { field: 'title', headerName: '活动', flex: 2, minWidth: 170, tooltipValueGetter: ({ value }) => window.HelpaniI18n.t(value), getQuickFilterText: ({ value }) => window.HelpaniI18n.t(value) },
+      { field: 'status', headerName: '核验状态', width: 200, cellClass: 'organizer-cell', cellRenderer: renderStatus, getQuickFilterText: () => '' },
+      { field: 'points', headerName: '核验积分', width: 125, valueFormatter: ({ value }) => `+${value}`, getQuickFilterText: () => '' },
       {
         colId: 'verify',
         headerName: '操作',
-        width: 103,
+        width: 175,
         pinned: 'right',
         lockPinned: true,
         sortable: false,
@@ -192,6 +192,12 @@ function initialize() {
   refresh.addEventListener('click', load);
   window.addEventListener('pageshow', (event) => {
     if (event.persisted) load();
+  });
+  window.addEventListener('helpani:languagechange', () => {
+    api.resetQuickFilter();
+    api.setGridOption('quickFilterText', search.value);
+    api.refreshHeader();
+    api.refreshCells({ force: true });
   });
   load();
 }

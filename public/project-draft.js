@@ -155,7 +155,7 @@ async function refreshBudget() {
     const response = await fetch('/api/project-budget', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sourceIds }),
+      body: JSON.stringify({ sourceIds, locale: window.HelpaniI18n.locale }),
       signal: controller.signal,
     });
     const audit = await readResponse(response);
@@ -286,7 +286,7 @@ form.addEventListener('submit', async (event) => {
     const response = await fetch('/api/project-draft', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sourceIds }),
+      body: JSON.stringify({ sourceIds, locale: window.HelpaniI18n.locale }),
       signal: controller.signal,
     });
     const draft = await readResponse(response);
@@ -326,4 +326,15 @@ form.addEventListener('submit', async (event) => {
 
 retrySources.addEventListener('click', loadSources);
 retryBudget.addEventListener('click', refreshBudget);
+window.addEventListener('helpani:languagechange', () => {
+  const hadDraft = !content.hidden || generating;
+  generationRequest += 1;
+  generationController?.abort();
+  generating = false;
+  clearDraft();
+  if (hadDraft) setStatus(status, window.HelpaniI18n.locale === 'en'
+    ? 'Language changed. Generate a new draft in English using the selected sources.'
+    : '语言已切换。请依据保留的所选资料重新生成中文草稿。');
+  syncControls();
+});
 loadSources();
