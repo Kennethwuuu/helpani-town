@@ -185,7 +185,7 @@ export async function generateProjectDraft(sourceIds, { beforeGatewayRequest = (
           messages: [
             {
               role: 'system',
-              content: `你为动物救助小镇整理简短草稿，本次项目资料均为虚构。${locale === 'zh-CN' ? '所有面向用户的文字使用简体中文。' : 'Write all user-facing strings in English, including summary, budgetFlags, task title and instructions. Translate source quotations faithfully into English. Keep source IDs unchanged.'}
+              content: `你为动物救助小镇整理简短草稿，本次项目资料均为虚构。${locale === 'zh-CN' ? '所有面向用户的文字使用简体中文。' : 'Write all user-facing strings in English, including summary, budgetFlags, task title and instructions. Translate source quotations faithfully into English. Keep source IDs unchanged. Translate every source title and quotation into English too; do not include any Chinese Han characters in user-facing strings, even in quoted original titles.'}
 唯一事实依据是用户消息中本次所选记录的 text。只采用这些记录明确写出的事实、计划和限定语，不引用未选资料，不用常识补齐项目细节。本提示中的术语与限制不是项目资料。
 区分事实已发生、计划、记录待更新以及完全未提及。逐字保留这些状态的含义：“记录待更新”只说明记录待更新，不能据此判断实际步骤已完成或尚未执行。需求数量只表示需求，不能改写为已采购或已送达数量。未提及的信息保持缺失，摘要应完全省略，不自行补写相关步骤、状态或结论。
 summary 只简短整理所选文字，保留虚构、样例、准备、待更新、待确认等原有范围。不要扩充项目的紧急程度、执行规模、部署、设备、动物照护或救助成果。
@@ -195,7 +195,7 @@ task.sourceIds 必须引用本次所选记录的原始 ID；任务中每个事�
 输出必须是可直接 JSON.parse 的合法 JSON 对象。字符串内引用资料标题或原句时使用单引号或正确转义的双引号。summary 最多 480 字符，每项 budgetFlags 最多 160 字符，task.title 最多 100 字符，task.instructions 最多 500 字符。不要使用 Markdown。只返回符合此 JSON Schema 的对象：${JSON.stringify(draftFormat(sourceIds))}`,
             },
             { role: 'user', content: JSON.stringify(sources) },
-            ...(attempt === 0 ? [] : [{ role: 'user', content: `上一轮响应未通过 JSON 或字段校验。请重新依据相同所选资料生成更简短的合法 JSON，逐项核对 schema 和来源 ID。摘要不超过 480 字符，任务说明不超过 500 字符。${locale === 'zh-CN' ? '使用简体中文。' : 'All user-facing strings must be in English.'}` }]),
+            ...(attempt === 0 ? [] : [{ role: 'user', content: `上一轮响应未通过 JSON 或字段校验。请重新依据相同所选资料生成更简短的合法 JSON，逐项核对 schema 和来源 ID。摘要不超过 480 字符，任务说明不超过 500 字符。${locale === 'zh-CN' ? '使用简体中文。' : 'All user-facing strings must be in English. Translate source titles and quotations; do not include Chinese Han characters.'}` }]),
           ],
         }),
       });
@@ -227,6 +227,7 @@ task.sourceIds 必须引用本次所选记录的原始 ID；任务中每个事�
         || !validSourceIds(task?.sourceIds, sourceIds)) {
         throw invalidResponse();
       }
+      if (locale === 'en' && [draft.summary, ...draft.budgetFlags, task.title, task.instructions].some((text) => /\p{Script=Han}/u.test(text))) throw invalidResponse();
       return {
         summary: draft.summary.trim(),
         budgetFlags: draft.budgetFlags.map((flag) => flag.trim()),

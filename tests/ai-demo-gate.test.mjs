@@ -52,8 +52,8 @@ function configureGateway() {
 }
 
 function completion(content = JSON.stringify({
-  summary: '虚构观察资料记录入口亮光。', budgetFlags: ['所选资料未提供预算信息。'],
-  task: { title: '阅读观察记录', instructions: '在资料中找到亮光的位置描述。', sourceIds: ['observation-notes'] },
+  summary: 'Fictional observation notes describe entrance light.', budgetFlags: ['No budget information is provided.'],
+  task: { title: 'Read the observation notes', instructions: 'Find the location description of the light in the selected notes.', sourceIds: ['observation-notes'] },
 })) {
   return new Response(JSON.stringify({ choices: [{ message: { content } }] }), {
     headers: { 'Content-Type': 'application/json' },

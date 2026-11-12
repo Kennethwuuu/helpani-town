@@ -62,8 +62,8 @@ before(async () => {
     globalThis.fetch = async url => {
       if (String(url) !== 'https://gateway.example.test/v1/chat/completions') throw new Error('Unexpected upstream');
       return new Response(JSON.stringify({choices:[{finish_reason:'stop',message:{content:JSON.stringify({
-        summary:'虚构观察记录描述入口亮光。',budgetFlags:['所选资料未提供预算信息。'],
-        task:{title:'阅读位置描述',instructions:'在原文找出亮光从哪里进入。',sourceIds:['observation-notes']}
+        summary:'Fictional notes describe light entering at two points.',budgetFlags:['No budget information is provided.'],
+        task:{title:'Read the location notes',instructions:'Find where the light enters in the selected text.',sourceIds:['observation-notes']}
       })}}]}), {headers:{'Content-Type':'application/json'}});
     };
   `);

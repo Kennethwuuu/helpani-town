@@ -33,9 +33,9 @@ function configure() {
 
 function draft(sourceIds = ['observation-notes']) {
   return {
-    summary: '  所选虚构观察资料记录了两处入口亮光。  ',
-    budgetFlags: ['  所选资料未提供预算。  '],
-    task: { title: '  找到亮光  ', instructions: '  在虚拟地图辨认亮光位置。  ', sourceIds },
+    summary: '  The selected fictional notes describe two points of light.  ',
+    budgetFlags: ['  The selected source provides no budget.  '],
+    task: { title: '  Find the light  ', instructions: '  Read the notes and locate the described entrance.  ', sourceIds },
   };
 }
 
@@ -171,7 +171,7 @@ test('draft language defaults to English and keeps the requested language on a f
   configure();
   for (const locale of [undefined, 'en', 'zh-CN']) {
     const calls = [];
-    const localized = locale === 'zh-CN' ? draft() : {
+    const localized = locale === 'zh-CN' ? { ...draft(), summary: '虚构观察记录描述两处亮光。', task: { ...draft().task, title: '阅读观察记录', instructions: '阅读原文，找到亮光入口描述。' } } : {
       summary: 'The fictional observation notes describe light entering at two points.',
       budgetFlags: ['The selected source does not provide budget information.'],
       task: {
@@ -343,4 +343,22 @@ test('malformed upstream envelopes, JSON and schema or citation violations canno
     globalThis.fetch = async () => new Response(payload);
     await assert.rejects(generateProjectDraft(['observation-notes']), expectedError(502, 'AI_RESPONSE_INVALID'));
   }
+});
+
+
+test('English drafts translate quoted source titles; mixed-language output uses only the bounded retry', async () => {
+  configure();
+  const mixed = {...draft(), task:{...draft().task, instructions:"Read the source '观察区说明' and identify the described entrance."}};
+  let calls = 0;
+  globalThis.fetch = async () => completion(JSON.stringify(++calls === 1 ? mixed : draft()));
+  const corrected = await generateProjectDraft(['observation-notes']);
+  assert.equal(calls, 2);
+  assert.equal(corrected.generation.attempts, 2);
+  assert.equal(/\p{Script=Han}/u.test(corrected.task.instructions), false);
+  calls = 0;
+  globalThis.fetch = async () => { calls++; return completion(JSON.stringify(mixed)); };
+  await assert.rejects(generateProjectDraft(['observation-notes']), expectedError(502, 'AI_RESPONSE_INVALID'));
+  assert.equal(calls, 2);
+  const chinese = await generateProjectDraft(['observation-notes'], {locale:'zh-CN'});
+  assert.equal(chinese.task.instructions, mixed.task.instructions.trim());
 });
