@@ -1,0 +1,30 @@
+# Unapplied template for the existing Ubuntu server.
+# Inspect existing services and paths before installing or enabling this unit.
+# Create a separate helpani-town user/group; keep its Node runtime independent
+# of any system-wide Node installation or existing OpenClaw service.
+# Populate /etc/helpani-town/runtime.env privately as root with mode 0600.
+# Confirm the runtime path and selected release before starting.
+
+[Unit]
+Description=Helpani Town demo
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=exec
+User=helpani-town
+Group=helpani-town
+WorkingDirectory=/opt/helpani-town/current
+EnvironmentFile=/etc/helpani-town/runtime.env
+ExecStart=/opt/helpani-town/runtime/bin/node /opt/helpani-town/current/server/index.mjs
+StateDirectory=helpani-town
+StateDirectoryMode=0700
+UMask=0077
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=30s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

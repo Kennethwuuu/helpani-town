@@ -1,0 +1,17 @@
+# Unapplied, optional site example. Inspect the existing reverse proxy first.
+# Do not replace the server's global Caddyfile, Nginx/Apache configuration, or
+# an OpenClaw site's configuration with this file. Add an isolated site only.
+# Replace the placeholder hostname and confirm DNS/TCP 80/443 before enabling.
+# Match PUBLIC_ORIGIN and the inspected free loopback port in runtime.env.
+
+demo.example.org {
+	reverse_proxy 127.0.0.1:3120 {
+		# Proxy the entire hostname at /, preserving URI, Origin, and cookies.
+		transport http {
+			# Cover the application's shared 45-second AI deadline.
+			response_header_timeout 60s
+			# Keep idle upstream reuse shorter than Node's HTTP keep-alive timeout.
+			keepalive 2s
+		}
+	}
+}

@@ -1,8 +1,10 @@
 # Helpani Town 动物救助小镇
 
-[English judge guide](docs/judges-guide.md) · [English demo script](docs/demo-script-en.md) · [Existing-server deployment plan](docs/deploy-existing-server.md)
+[线上试玩](https://vibecreating.tech) · [English judge guide](docs/judges-guide.md) · [English demo script](docs/demo-script-en.md) · [Server deployment guide](docs/deploy-existing-server.md)
 
 一个聚焦野生动物保护与救助的公益游戏原型。玩家选择或随机遇见一位虚拟动物伙伴，喂养并解锁成长手记，也可以浏览上海样例活动，体验报名、模拟核验和项目支持。项目、机构、活动、赞助预算及救助更新均为演示数据。
+
+线上游戏和 Astropods 草稿已实际验证，应用重启后照护与 AI 计数保留；新域名的 US$5 PayPal Sandbox 付款已完成回跳，与远端订单、捕获及线上账本核对一致，重启后支付记录保留。部署版本、验证范围和剩余事项见 [线上部署记录](docs/vps-deployment-2026-11-12.md)。
 
 本轮“小熊猫的新休息角落”以动物自主生活为核心：观察竹竹探索、攀爬和休息，选择平台位置，再拍下自己布置中的瞬间。生活、布置、摄影与巡护带回木道的闭环已实现并实际试玩。巡护包含 6 道科普问答、答案解释、资料来源和知识册，见 [问答实现与验收](docs/patrol-quiz-2026-11-09.md)。最新完成首次掌握反馈、针对错误的解释、插画勋章揭晓和可保存到照片的勋章角标，见 [奖励实现与试玩记录](docs/quiz-rewards-2026-11-09.md)。动作、恢复与摄影复测见 [2026-11-09 测试记录](docs/playtest-2026-11-09.md)，初次验收及头部造型修复见 [2026-11-08 试玩记录](docs/playtest-2026-11-08.md)。功能说明不代替验收记录。
 
