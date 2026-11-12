@@ -158,7 +158,7 @@ function invalidResponse() {
   return new ProjectDraftError(502, 'Astropods 返回的草稿格式或引用无效，请重试并核对资料。', 'AI_RESPONSE_INVALID');
 }
 
-export async function generateProjectDraft(sourceIds) {
+export async function generateProjectDraft(sourceIds, { beforeGatewayRequest = () => {} } = {}) {
   const sources = selectedProjectSources(sourceIds);
   const budgetAudit = auditProjectBudget(sourceIds);
   const config = gatewayConfig();
@@ -172,6 +172,7 @@ export async function generateProjectDraft(sourceIds) {
   const signal = AbortSignal.timeout(timeoutMs);
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
+      await beforeGatewayRequest();
       const response = await fetch(config.endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.key}` },

@@ -4,7 +4,7 @@
 
 The tested runtime is `e7a5b480cd30242cd0d0009620d1c57f89c5fb12` on `codex/ai-draft-readiness`. The [latest incremental report](qa-report-2026-11-12-e7a5b48.md) records eight functional IDs passed, zero failed, and two P1 IDs blocked. All five functional P0 IDs passed: GAME-02, MOB-01, AI-04, PAY-03, and PAY-05. The test agent made no implementation changes.
 
-Preserve that runtime as the release candidate. Documentation-only handoff changes do not require repeating its gameplay, payment, or AI tests. Later implementation changes require targeted regression for the affected paths.
+Preserve that runtime as the functional baseline. Documentation-only handoff changes do not require repeating its gameplay, payment, or AI tests. Hosting adaptations are a later implementation change and have their own [targeted readiness evidence](hosting-readiness-2026-11-12.md). The final hosted candidate still needs deployment-specific acceptance.
 
 ## Remaining acceptance
 
@@ -22,7 +22,7 @@ The remaining count is six IDs: two partial P1 blocks and four release gates. Ex
 ## Execution order
 
 1. **Prepare the release package.** Archive the new QA report, update the remaining-test list, and prepare the final default-branch version, LICENSE decision, asset notices, [English project description](devpost-submission-draft.md), and judge instructions. The repository remains private until its owner authorizes publication.
-2. **Resolve judge access.** Select the hosted-demo or independent-run route early. Local blank-key gameplay is useful installation evidence, but does not establish that judges can exercise the AI and Sandbox flows. Keep developer keys in private server configuration or another explicitly permitted private access arrangement, rather than the public repository.
+2. **Resolve judge access.** The owner selected an online Web demo. The [Render deployment plan](deploy-render.md) uses one paid Node instance and a persistent SQLite disk; its resource creation still requires approval. Local blank-key gameplay is useful installation evidence, but does not establish that judges can exercise the AI and Sandbox flows. Keep developer keys in private server configuration or another explicitly permitted private access arrangement, rather than the public repository.
 3. **Record the demonstrated product.** Use the [English demo script](demo-script-en.md): virtual animal care and stories, simulated activity verification and points, source-grounded Astropods drafting with human review, and a PayPal Sandbox specified-material payment. Keep fictional projects, virtual growth, test payment, procurement, and rescue outcomes distinct. Generated tasks remain organizer-review drafts, not published game tasks.
 4. **Complete the release checks.** Run REL-01 through REL-04 against the final package, check every submission URL while signed out, and reconcile the video, README, repository, and submitted commit. Record the two P1 outcomes or their remaining limitations separately.
 

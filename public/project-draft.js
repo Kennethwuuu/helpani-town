@@ -250,6 +250,8 @@ function generationError(error) {
     return '生成服务暂时不可用。请联系演示维护者后刷新页面。';
   }
   if (error.code === 'AI_SOURCE_SELECTION_INVALID' || error.status === 400) return '本次资料选择无法使用，请重新选择后再生成。';
+  if (error.code === 'AI_DEMO_BUSY') return '另一份演示草稿正在生成，请稍后重试。所选资料已保留。';
+  if (error.code === 'AI_DEMO_LIMIT_REACHED') return '本轮在线 AI 演示次数已用完，请联系演示维护者。仍可查看原始资料和预算核对。';
   if (error.code === 'AI_RATE_LIMITED' || error.status === 429) return '生成服务当前繁忙或额度受限，请稍后重试。所选资料已保留。';
   if (error.code === 'AI_TIMEOUT' || error.name === 'AbortError' || error.status === 504) return '本次生成等待较久，尚未取得草稿。请稍后重试。';
   if (error.code === 'AI_AUTHENTICATION_FAILED') return '生成服务的连接验证未通过，请联系演示维护者。所选资料已保留。';

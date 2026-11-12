@@ -1,6 +1,6 @@
 # Helpani Town 动物救助小镇
 
-[English judge guide](docs/judges-guide.md) · [English demo script](docs/demo-script-en.md)
+[English judge guide](docs/judges-guide.md) · [English demo script](docs/demo-script-en.md) · [Render deployment guide](docs/deploy-render.md)
 
 一个聚焦野生动物保护与救助的公益游戏原型。玩家选择或随机遇见一位虚拟动物伙伴，喂养并解锁成长手记，也可以浏览上海样例活动，体验报名、模拟核验和项目支持。项目、机构、活动、赞助预算及救助更新均为演示数据。
 

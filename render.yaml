@@ -1,0 +1,41 @@
+# Paid compute plus a persistent disk. Review the Render plan before applying.
+# Secrets are entered in Render; no local player database is uploaded.
+services:
+  - type: web
+    name: helpani-town-demo
+    runtime: node
+    plan: 0.5c-512mb
+    region: singapore
+    branch: codex/ai-draft-readiness
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeployTrigger: "off"
+    numInstances: 1
+    disk:
+      name: helpani-demo-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: DB_PATH
+        value: /var/data/helpani.sqlite
+      - key: ASTRO_GATEWAY_MODEL
+        value: claude-sonnet-4-6
+      - key: AI_DEMO_MAX_REQUESTS
+        value: "100"
+      - key: AI_DEMO_SESSION_MAX_REQUESTS
+        value: "10"
+      - key: AI_DEMO_MAX_CONCURRENT
+        value: "1"
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: ASTRO_GATEWAY_URL
+        sync: false
+      - key: ASTRO_GATEWAY_API_KEY
+        sync: false

@@ -7,10 +7,11 @@ import { capturePayPalOrder, createPayPalOrder, paypalConfigured } from './paypa
 import { auditProjectBudget, generateProjectDraft, projectAiConfigured, projectAiStatus, ProjectDraftError, projectSources } from './project-ai.mjs';
 import { createGameStore, GameError } from './game.mjs';
 import { companionPatrols } from './companion-patrol.mjs';
+import { createAiDemoGate } from './ai-demo-gate.mjs';
 
 const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || 'localhost';
-const origin = new URL(process.env.PUBLIC_ORIGIN || `http://localhost:${port}`).origin;
+const origin = new URL(process.env.PUBLIC_ORIGIN || process.env.RENDER_EXTERNAL_URL || `http://localhost:${port}`).origin;
 const dbPath = process.env.DB_PATH || 'data/helpani.sqlite';
 if (dbPath !== ':memory:') mkdirSync(dirname(resolve(dbPath)), { recursive: true });
 const db = new DatabaseSync(dbPath);
@@ -74,6 +75,7 @@ db.exec(`
   ) STRICT;
 `);
 
+const aiDemoGate = createAiDemoGate(db);
 const sponsor = { points: 100, allocationCents: 200, poolCents: 1000 };
 const game = createGameStore(db);
 const exchangeCost = 50;
@@ -318,6 +320,7 @@ const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url, origin);
     const path = url.pathname;
+    if (req.method === 'GET' && path === '/healthz') return json(res, 200, { status: 'ok' });
     const asset = req.method === 'GET' ? assetFor(path) : undefined;
     if (asset) {
       const [filename, mime] = asset;
@@ -363,7 +366,9 @@ const server = createServer(async (req, res) => {
     }
     if (req.method === 'POST' && path === '/api/project-draft') {
       const { sourceIds } = (await readJson(req)) ?? {};
-      return json(res, 200, await generateProjectDraft(sourceIds));
+      return json(res, 200, await aiDemoGate.run(sessionId, () => generateProjectDraft(sourceIds, {
+        beforeGatewayRequest: () => aiDemoGate.consumeAttempt(sessionId),
+      })));
     }
     if (req.method === 'POST' && path === '/api/care') {
       addEvent.run(sessionId, 'care');

@@ -35,6 +35,7 @@ before(async () => {
       DB_PATH: join(directory, 'town.sqlite'), PAYPAL_CLIENT_ID: '', PAYPAL_CLIENT_SECRET: '',
       ASTRO_GATEWAY_URL: '', ASTRO_GATEWAY_API_KEY: 'qa-placeholder-not-a-real-key',
       ASTRO_GATEWAY_MODEL: 'qa-model', MODEL_DEFAULT: '',
+      RENDER_EXTERNAL_URL: '', AI_DEMO_MAX_REQUESTS: '0', AI_DEMO_SESSION_MAX_REQUESTS: '10', AI_DEMO_MAX_CONCURRENT: '1',
     },
   });
   closed = new Promise(resolve => child.once('close', resolve));
