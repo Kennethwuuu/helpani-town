@@ -1,5 +1,7 @@
 # Render deployment guide
 
+**Current decision:** the owner declined new paid Render hosting and offered an existing Alibaba Cloud server. Continue with the [existing-server plan](deploy-existing-server.md). This Render configuration remains an unapplied reference; do not create its resources.
+
 Status: **prepared for review; no hosted service has been created or verified** as of November 12, 2026. The owner has not approved the hosting cost. Review the settings and estimate below before creating or applying any paid resources.
 
 Current blocker: Render's Blueprint validation endpoint returned HTTP 200 with `valid: false`; its only reported error was `need_payment_info` at `services[0]`. HTTP success is not a successful Blueprint validation. Read-only inspection found no services, and no resources were created. The owner must personally configure billing in Render and approve the specific US$7.25/month baseline plan before creation can proceed. The 33 passing local checks below do not resolve this account-level blocker.
