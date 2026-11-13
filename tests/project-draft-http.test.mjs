@@ -207,3 +207,93 @@ test('HTTP locale allowlist preserves both paid attempts for English-default and
     assert.deepEqual(JSON.parse(call.messages[1].content).map(source => source.id), ['observation-notes']);
   }
 });
+
+test('abandoning an HTTP draft aborts the Gateway, promptly frees the slot, and keeps its attempt charged', { timeout: 15000 }, async t => {
+  const mockFile = join(directory, 'cancel-gateway-mock.mjs');
+  await writeFile(mockFile, `
+    let calls = 0;
+    globalThis.fetch = async (url, { signal }) => {
+      if (String(url) !== 'https://cancel-gateway.example.test/v1/chat/completions') {
+        throw new Error('Real network access is disabled in HTTP cancellation tests.');
+      }
+      calls += 1;
+      if (calls === 1) return new Promise((resolve, reject) => {
+        signal.addEventListener('abort', () => {
+          process.send({ type: 'gateway-aborted' });
+          reject(signal.reason);
+        }, { once: true });
+        process.send({ type: 'gateway-started' });
+      });
+      const draft = {
+        summary: 'Fictional notes describe light entering at two points.', budgetFlags: [],
+        task: {
+          title: 'Read the fictional notes',
+          instructions: 'Read the selected notes and identify the number of light-entry points.',
+          sourceIds: ['observation-notes'],
+        },
+      };
+      return new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify(draft) } }] }));
+    };
+  `);
+  const reservation = createServer();
+  reservation.listen(0, '127.0.0.1');
+  await once(reservation, 'listening');
+  const { port } = reservation.address();
+  await new Promise(resolve => reservation.close(resolve));
+  const cancelOrigin = `http://127.0.0.1:${port}`;
+  const cancelServer = spawn(process.execPath, ['--import', mockFile, 'server/index.mjs'], {
+    cwd: join(directory, 'runtime'), stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
+    env: {
+      ...process.env, PORT: String(port), HOST: '127.0.0.1', PUBLIC_ORIGIN: cancelOrigin,
+      DB_PATH: join(directory, 'cancel-town.sqlite'), PAYPAL_CLIENT_ID: '', PAYPAL_CLIENT_SECRET: '',
+      ASTRO_GATEWAY_URL: 'https://cancel-gateway.example.test', ASTRO_GATEWAY_API_KEY: 'cancel-unit-test-only',
+      ASTRO_GATEWAY_MODEL: 'cancel-test-model', MODEL_DEFAULT: '', RENDER_EXTERNAL_URL: '',
+      AI_DEMO_MAX_REQUESTS: '2', AI_DEMO_SESSION_MAX_REQUESTS: '2', AI_DEMO_MAX_CONCURRENT: '1',
+    },
+  });
+  const cancelClosed = new Promise(resolve => cancelServer.once('close', resolve));
+  t.after(async () => {
+    if (cancelServer.exitCode === null && cancelServer.signalCode === null) cancelServer.kill('SIGTERM');
+    await cancelClosed;
+  });
+  await waitForStartup(cancelServer);
+  function waitForGateway(type) {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => finish(new Error(`Gateway did not report ${type}.`)), 3000);
+      const onMessage = message => { if (message.type === type) finish(); };
+      function finish(error) {
+        clearTimeout(timeout);
+        cancelServer.off('message', onMessage);
+        error ? reject(error) : resolve();
+      }
+      cancelServer.on('message', onMessage);
+    });
+  }
+  const metadata = await fetch(new URL('/api/project-draft', cancelOrigin));
+  const cancelCookie = metadata.headers.get('set-cookie').split(';')[0];
+  await metadata.json();
+  async function generate(signal = AbortSignal.timeout(5000)) {
+    const response = await fetch(new URL('/api/project-draft', cancelOrigin), {
+      method: 'POST',
+      headers: { Origin: cancelOrigin, Cookie: cancelCookie, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sourceIds: ['observation-notes'] }), signal,
+    });
+    return { status: response.status, body: await response.json() };
+  }
+  const controller = new AbortController();
+  const started = waitForGateway('gateway-started');
+  const first = assert.rejects(generate(controller.signal), { name: 'AbortError' });
+  await started;
+  const busy = await generate();
+  assert.equal(busy.status, 503, 'the first request holds the sole slot while its client remains connected');
+  assert.equal(busy.body.code, 'AI_DEMO_BUSY');
+  const aborted = waitForGateway('gateway-aborted');
+  controller.abort();
+  await first;
+  await aborted;
+  const next = await generate();
+  assert.equal(next.status, 200, 'a new draft can start immediately after the abandoned upstream request aborts');
+  const exhausted = await generate();
+  assert.equal(exhausted.status, 503);
+  assert.equal(exhausted.body.code, 'AI_DEMO_LIMIT_REACHED', 'the abandoned Gateway attempt is still charged');
+});

@@ -332,9 +332,7 @@ window.addEventListener('helpani:languagechange', () => {
   generationController?.abort();
   generating = false;
   clearDraft();
-  if (hadDraft) setStatus(status, window.HelpaniI18n.locale === 'en'
-    ? 'Language changed. Generate a new draft in English using the selected sources.'
-    : '语言已切换。请依据保留的所选资料重新生成中文草稿。');
+  if (hadDraft) setStatus(status, '语言已切换。请依据保留的所选资料重新生成草稿。');
   syncControls();
 });
 loadSources();

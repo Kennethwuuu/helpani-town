@@ -73,6 +73,7 @@ window.HelpaniI18n.add({
   '{0}在玩家布置中的静态照片': 'A still photo of {0} in your habitat layout',
   '把巡护勋章带进照片': 'Add a patrol medal to your photo',
   '获得的勋章可用作照片角标。': 'Use a collected medal as a photo badge.',
+  '正在读取巡护勋章…': 'Loading patrol badges…',
   '静态裁切': 'Crop this photo',
   '可拖动照片调整中心': 'Drag the photo to adjust its center',
   '保存到相册': 'Save to album',

@@ -1,4 +1,4 @@
-export function mountPatrol(host, { species = 'red-panda', onReturn, onUseMedal } = {}) {
+export function mountPatrol(host, { species = 'red-panda', onReturn, onUseMedal, onStateChange } = {}) {
   const panda = species === 'red-panda';
   const companion = species === 'pangolin' ? {animal:'中华穿山甲',name:'小松',place:'蕨叶谷',title:'蕨叶谷巡护',routeLabel:'8 格林下路线',nodeNames:['巡护站','落叶径','树根旁','泥土坡','半程记','蚁丘望','蕨叶湾','归途','安静角落'],themeLabels:{rest:'认识穿山甲',habitat:'林地与保护'},topicLabels:{canopy:'身体的秘密',maintenance:'林地与保护',tracks:'林下的生活'}}
     : species === 'sea-turtle' ? {animal:'绿海龟',name:'阿潮',place:'潮汐湾',title:'潮汐湾巡护',routeLabel:'8 格浅海路线',nodeNames:['巡护站','海草湾','浅礁旁','水面光','半程记','沙滩望','蓝水径','归途','潮汐留影'],themeLabels:{rest:'认识绿海龟',habitat:'海洋与保护'},topicLabels:{canopy:'身体的秘密',maintenance:'海洋与保护',tracks:'浅湾的生活'}}
@@ -161,6 +161,7 @@ export function mountPatrol(host, { species = 'red-panda', onReturn, onUseMedal 
     renderMedals();
     $('patrol-journal-count').textContent=`(${state.journal.length})`;$('patrol-journal').replaceChildren();
     for(const entry of [...state.journal].reverse()){const li=document.createElement('li');li.append(textElement('strong',entry.title));if(entry.quiz){li.append(textElement('p',`${entry.quiz.correct?'猜中了':'新的认识'} · ${entry.quiz.correctAnswer}`),textElement('p',entry.quiz.explanation));addSource(li,entry.quiz.source);}else li.append(textElement('p',entry.text));$('patrol-journal').append(li);}
+    onStateChange?.();
   }
   async function recover() {
     if(disposed||busy||moving||document.hidden||recovering||!host.isConnected)return;

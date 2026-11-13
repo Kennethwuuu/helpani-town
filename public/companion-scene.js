@@ -58,7 +58,7 @@ export class CompanionScene extends WoodlandScene {
     this.callbacks.onLayoutApplied?.(this.layoutVersion);return true;
   }
   report(behavior,facilityId=null){
-    const key=`${behavior}:${facilityId||''}:${facilityId?this.layoutVersion:0}`;
+    const key=`${behavior}:${facilityId||''}:${this.layoutVersion}`;
     if(this.reported.has(key))return;this.reported.add(key);
     this.callbacks.onObserve?.({behavior,facilityId,layoutVersion:this.layoutVersion});
   }

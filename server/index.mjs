@@ -367,12 +367,24 @@ const server = createServer(async (req, res) => {
       return json(res, 200, auditProjectBudget(sourceIds));
     }
     if (req.method === 'POST' && path === '/api/project-draft') {
-      const { sourceIds, locale = 'en' } = (await readJson(req)) ?? {};
-      if (!['en', 'zh-CN'].includes(locale)) throw new RequestError(400, '请选择 English 或中文。');
-      return json(res, 200, await aiDemoGate.run(sessionId, () => generateProjectDraft(sourceIds, {
-        locale,
-        beforeGatewayRequest: () => aiDemoGate.consumeAttempt(sessionId),
-      })));
+      const controller = new AbortController();
+      // IncomingMessage.close also fires after a complete request body. The
+      // response closes early only when the client abandons the pending draft.
+      const cancelGeneration = () => {
+        if (!res.writableEnded) controller.abort();
+      };
+      res.once('close', cancelGeneration);
+      try {
+        const { sourceIds, locale = 'en' } = (await readJson(req)) ?? {};
+        if (!['en', 'zh-CN'].includes(locale)) throw new RequestError(400, '请选择 English 或中文。');
+        return json(res, 200, await aiDemoGate.run(sessionId, () => generateProjectDraft(sourceIds, {
+          locale,
+          signal: controller.signal,
+          beforeGatewayRequest: () => aiDemoGate.consumeAttempt(sessionId),
+        })));
+      } finally {
+        res.off('close', cancelGeneration);
+      }
     }
     if (req.method === 'POST' && path === '/api/care') {
       addEvent.run(sessionId, 'care');
@@ -524,7 +536,7 @@ const server = createServer(async (req, res) => {
     const knownError = error instanceof RequestError || error instanceof ProjectDraftError || error instanceof GameError;
     const status = knownError ? error.status : error.code === 'ENOENT' ? 404 : 502;
     if (status >= 500 && !knownError) console.error('Request failed:', error.message);
-    if (!res.headersSent) json(res, status, { error: knownError ? error.message : '暂时无法完成，请稍后重试。', ...(error instanceof ProjectDraftError && error.code ? { code: error.code } : {}), ...(error instanceof GameError && error.state ? { state: error.state } : {}) });
+    if (!res.destroyed && !res.headersSent) json(res, status, { error: knownError ? error.message : '暂时无法完成，请稍后重试。', ...(error instanceof ProjectDraftError && error.code ? { code: error.code } : {}), ...(error instanceof GameError && error.state ? { state: error.state } : {}) });
   }
 });
 

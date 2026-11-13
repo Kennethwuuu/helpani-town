@@ -221,7 +221,9 @@ export class WoodlandScene {
     return true;
   }
   report(behavior, facilityId = null) {
-    const key = `${behavior}:${facilityId || ''}:${facilityId ? this.layoutVersion : 0}`;
+    // An unacknowledged discovery can expire when a new layout is applied.
+    // Let the next real occurrence report against that layout as well.
+    const key = `${behavior}:${facilityId || ''}:${this.layoutVersion}`;
     if (this.reported.has(key)) return;
     this.reported.add(key);
     this.callbacks.onObserve?.({ behavior, facilityId, layoutVersion: this.layoutVersion });

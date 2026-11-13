@@ -118,6 +118,7 @@ window.HelpaniI18n.add({
   '请至少选择一条资料。': 'Select at least one source.',
   '资料选择已更新，可以生成新草稿。': 'Source selection updated. You can generate a new draft.',
   '资料选择已更新，预算核对仍可使用。': 'Source selection updated. Budget review is still available.',
+  '语言已切换。请依据保留的所选资料重新生成草稿。': 'Language changed. Generate a new draft using the selected sources.',
   'Astropods 正在依据当前资料生成草稿…': 'Astropods is generating a draft from the selected sources…',
   'AI 未补充建议复核项，请继续对照资料预算和原文。': 'AI added no review suggestions. Continue checking the source budget and original text.',
   '{0} · 本次请求模型 {1}': '{0} · Requested model: {1}',

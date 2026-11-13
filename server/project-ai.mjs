@@ -158,7 +158,7 @@ function invalidResponse() {
   return new ProjectDraftError(502, 'Astropods 返回的草稿格式或引用无效，请重试并核对资料。', 'AI_RESPONSE_INVALID');
 }
 
-export async function generateProjectDraft(sourceIds, { beforeGatewayRequest = () => {}, locale = 'en' } = {}) {
+export async function generateProjectDraft(sourceIds, { beforeGatewayRequest = () => {}, locale = 'en', signal: requestSignal } = {}) {
   const sources = selectedProjectSources(sourceIds);
   const budgetAudit = auditProjectBudget(sourceIds);
   const config = gatewayConfig();
@@ -169,10 +169,13 @@ export async function generateProjectDraft(sourceIds, { beforeGatewayRequest = (
     throw new ProjectDraftError(503, message, config.issue);
   }
 
-  const signal = AbortSignal.timeout(timeoutMs);
+  const deadline = AbortSignal.timeout(timeoutMs);
+  const signal = requestSignal ? AbortSignal.any([requestSignal, deadline]) : deadline;
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
+      signal.throwIfAborted();
       await beforeGatewayRequest();
+      signal.throwIfAborted();
       const response = await fetch(config.endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.key}` },
@@ -237,6 +240,9 @@ task.sourceIds 必须引用本次所选记录的原始 ID；任务中每个事�
         reviewRequired: true,
       };
     } catch (error) {
+      if (requestSignal?.aborted) {
+        throw new ProjectDraftError(499, '本次草稿生成已取消。', 'AI_CANCELLED');
+      }
       if (error instanceof ProjectDraftError) {
         if (error.code === 'AI_RESPONSE_INVALID' && attempt === 0 && !signal.aborted) continue;
         throw error;

@@ -182,7 +182,7 @@ async function activate(view) {
   speciesOutboxes.set(activeSpecies,new Map(automaticOutbox));
   const generation=++sceneGeneration;sceneTarget=requested;activeSpecies=requested;
   patrolController?.destroy();patrolController=null;$('wood-patrol-host').replaceChildren();scene?.destroy();scene=null;habitat=null;automaticOutbox.clear();for(const [key,value] of speciesOutboxes.get(requested)||[])automaticOutbox.set(key,value);clearTimeout(automaticTimer);automaticTimer=null;
-  endPlacement();configureSpecies();
+  endPlacement();configureSpecies();syncPhotoReadiness();
   loading=(async()=>{
     try {
       const next=await fetchJSON(stateURL(requested)); if(generation!==sceneGeneration)return;habitat=next;
@@ -192,7 +192,9 @@ async function activate(view) {
       if(!patrolController){const patrolHost=document.createElement('div');$('wood-patrol-host').replaceChildren(patrolHost);patrolController=mountPatrol(patrolHost,{species:requested,
         onReturn:async()=>{await refreshHabitat();host.scrollIntoView({block:'start',behavior:'smooth'});scene.focusAnimal();const clue=window.helpaniPatrol?.state()?.lastResult?.quiz?.observationPrompt;notice(clue?`观察线索：${clue}`:'巡护收获已带回栖地，选择新设施，再观察伙伴的回应。');},
         onUseMedal:async()=>{setCameraMode(true);capturePhoto();},
+        onStateChange:()=>{if(generation===sceneGeneration)syncPhotoReadiness();},
       });}
+      syncPhotoReadiness();
       $('wood-patrol-host').hidden=false;
       if(new URLSearchParams(location.search).get('place')==='platform')beginPlacement(meta().facility);
       window.dispatchEvent(new CustomEvent('helpani-woodland-ready'));
@@ -245,6 +247,12 @@ function setCameraMode(value) {
 }
 $('wood-camera').onclick = () => setCameraMode(true); $('wood-camera-exit').onclick = () => setCameraMode(false);
 const photoDialog = $('wood-photo-dialog');
+function syncPhotoReadiness() {
+  const ready = Boolean(scene && patrolController?.state());
+  $('wood-shutter').disabled = !ready;
+  $('wood-shutter').textContent = ready ? '拍下这一刻' : '正在读取巡护勋章…';
+}
+syncPhotoReadiness();
 function showBlob(blob) { if (photoURL) URL.revokeObjectURL(photoURL); photoURL = URL.createObjectURL(blob); $('wood-photo-preview').src = photoURL; }
 let photoAccentBusy = false;
 function currentEquippedMedal() {
@@ -324,7 +332,7 @@ function requestCrop() {
     .catch((error) => { if(photo===targetPhoto && cropGeneration===requestedGeneration) { $('wood-photo-message').textContent=error.message; syncPhotoControls(); } });
 }
 function capturePhoto() {
-  if (!scene) return;
+  if (!scene || !patrolController?.state()) return;
   $('wood-photo-title').textContent=`${meta().place}留影`;
   $('wood-photo-preview').alt=`${meta().animal}${meta().name}在玩家布置中的静态照片`;
   sourceFrame = scene.capture({watermark:false}); photo = {id:crypto.randomUUID(),createdAt:new Date().toISOString(),snapshot:scene.snapshot(),species:activeSpecies,medal:currentEquippedMedal(),saved:false,ready:false};

@@ -314,6 +314,57 @@ test('network failures are unavailable, while the 45-second abort is a timeout w
   await assert.rejects(generateProjectDraft(['observation-notes']), expectedError(504, 'AI_TIMEOUT'));
 });
 
+test('cancellation before generation skips the Gateway and does not charge an attempt', async () => {
+  configure();
+  let attempts = 0;
+  let calls = 0;
+  globalThis.fetch = async () => { calls += 1; return completion(); };
+  await assert.rejects(generateProjectDraft(['observation-notes'], {
+    signal: AbortSignal.abort(),
+    beforeGatewayRequest: () => { attempts += 1; },
+  }), expectedError(499, 'AI_CANCELLED'));
+  assert.equal(attempts, 0);
+  assert.equal(calls, 0);
+});
+
+test('cancelling an in-flight generation aborts the Gateway without retrying or refunding the attempt', async () => {
+  configure();
+  const controller = new AbortController();
+  const started = Promise.withResolvers();
+  let attempts = 0;
+  let calls = 0;
+  globalThis.fetch = (_url, { signal }) => new Promise((resolve, reject) => {
+    calls += 1;
+    signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+    started.resolve(signal);
+  });
+  const cancelled = assert.rejects(generateProjectDraft(['observation-notes'], {
+    signal: controller.signal,
+    beforeGatewayRequest: () => { attempts += 1; },
+  }), expectedError(499, 'AI_CANCELLED'));
+  const gatewaySignal = await started.promise;
+  controller.abort();
+  await cancelled;
+  assert.equal(gatewaySignal.aborted, true);
+  assert.equal(attempts, 1);
+  assert.equal(calls, 1);
+});
+
+test('cancellation while reading an invalid response suppresses the format retry', async () => {
+  configure();
+  const controller = new AbortController();
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    controller.abort();
+    return completion('invalid JSON');
+  };
+  await assert.rejects(generateProjectDraft(['observation-notes'], {
+    signal: controller.signal,
+  }), expectedError(499, 'AI_CANCELLED'));
+  assert.equal(calls, 1);
+});
+
 test('malformed upstream envelopes, JSON and schema or citation violations cannot produce a draft', async () => {
   configure();
   const base = draft();

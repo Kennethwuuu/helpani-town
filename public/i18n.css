@@ -7,6 +7,10 @@ html[lang=en] .wallet small { white-space:normal; line-height:1.4; }
 html[lang=en] .wallet { flex-shrink:0; }
 html[lang=en] .intro > div { min-width:0; }
 html[lang=en] .tag { white-space:normal; max-width:100%; }
+@media (max-width:1000px) {
+  .header .header-inner { flex-wrap:wrap; gap:8px 20px; padding-block:9px; }
+  .header .primary-nav { order:3; width:100%; flex-wrap:wrap; }
+}
 @media (max-width:760px) {
   .header-inner { flex-wrap:wrap; }
   .header .organizer-header { flex-wrap:wrap; }
