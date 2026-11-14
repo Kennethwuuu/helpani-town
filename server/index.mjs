@@ -8,6 +8,8 @@ import { auditProjectBudget, generateProjectDraft, projectAiConfigured, projectA
 import { createGameStore, GameError } from './game.mjs';
 import { companionPatrols } from './companion-patrol.mjs';
 import { createAiDemoGate } from './ai-demo-gate.mjs';
+import { createPayPalLedger } from './paypal-ledger.mjs';
+import { createPayPalReconciler, paypalReconciliationSettings } from './paypal-reconciliation.mjs';
 
 const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || 'localhost';
@@ -64,17 +66,11 @@ db.exec(`
     verified INTEGER NOT NULL DEFAULT 0 CHECK (verified IN (0, 1)),
     PRIMARY KEY (session_id, activity_id)
   ) STRICT;
-  CREATE TABLE IF NOT EXISTS paypal_orders (
-    reference TEXT PRIMARY KEY NOT NULL,
-    session_id TEXT NOT NULL,
-    kind TEXT NOT NULL CHECK (kind IN ('donation', 'supply')),
-    amount_cents INTEGER NOT NULL CHECK (amount_cents > 0),
-    provider_id TEXT UNIQUE NOT NULL,
-    capture_id TEXT UNIQUE,
-    status TEXT NOT NULL DEFAULT 'created' CHECK (status IN ('created', 'pending', 'completed'))
-  ) STRICT;
 `);
 
+const reconciliationSettings = paypalReconciliationSettings();
+const paymentLedger = createPayPalLedger(db, reconciliationSettings);
+const paymentReconciler = createPayPalReconciler({ ledger: paymentLedger, ...reconciliationSettings });
 const aiDemoGate = createAiDemoGate(db);
 const sponsor = { points: 100, allocationCents: 200, poolCents: 1000 };
 const game = createGameStore(db);
@@ -159,22 +155,6 @@ const addExchange = db.prepare('INSERT INTO pet_exchanges (session_id, request_i
 const selectRegistrations = db.prepare('SELECT activity_id AS id, verified FROM activity_registrations WHERE session_id = ?');
 const addRegistration = db.prepare('INSERT OR IGNORE INTO activity_registrations (session_id, activity_id) VALUES (?, ?)');
 const verifyRegistration = db.prepare('UPDATE activity_registrations SET verified = 1 WHERE session_id = ? AND activity_id = ?');
-const selectPayments = db.prepare(`
-  SELECT kind, amount_cents AS amountCents, status FROM paypal_orders
-  WHERE session_id = ? AND status IN ('pending', 'completed') ORDER BY rowid DESC
-`);
-const addOrder = db.prepare(`
-  INSERT INTO paypal_orders (reference, session_id, kind, amount_cents, provider_id)
-  VALUES (?, ?, ?, ?, ?)
-`);
-const findOrder = db.prepare(`
-  SELECT reference, amount_cents AS amountCents, status FROM paypal_orders
-  WHERE provider_id = ? AND session_id = ?
-`);
-const saveCapture = db.prepare(`
-  UPDATE paypal_orders SET status = ?, capture_id = ? WHERE provider_id = ? AND status != 'completed'
-`);
-
 class RequestError extends Error {
   constructor(status, message) {
     super(message);
@@ -223,7 +203,7 @@ function state(sessionId, { gameDay, demoDay } = sessionCalendar(sessionId)) {
     budgetCents: sponsor.poolCents - allocatedCents,
     allocatedCents,
     paypalEnabled: paypalConfigured(),
-    payments: selectPayments.all(sessionId),
+    payments: paymentLedger.list(sessionId),
     pet,
     medals: earned.map(({ species }) => species),
     food,
@@ -514,18 +494,24 @@ const server = createServer(async (req, res) => {
       const cents = supply ? supplyAmount : amountCents;
       const reference = randomUUID();
       const order = await createPayPalOrder({ kind, amountCents: cents, reference, origin: checkoutOrigin });
-      addOrder.run(reference, sessionId, kind, cents, order.id);
+      paymentLedger.create(reference, sessionId, kind, cents, order.id);
       return json(res, 201, { approvalUrl: order.approvalUrl });
     }
     if (req.method === 'GET' && path === '/api/paypal/return') {
       const id = url.searchParams.get('token');
-      const order = id && findOrder.get(id, sessionId);
+      const order = id && paymentLedger.find(id, sessionId);
       if (!order) return redirectPayment(res, 'error');
-      if (order.status === 'completed') return redirectPayment(res, 'completed');
+      if (order.status !== 'created') {
+        if (order.status === 'pending') {
+          // A return may nudge a due read, but never repeats a pending capture.
+          void paymentReconciler.reconcileOrder(id).catch(() => console.warn('PayPal Sandbox pending check deferred.'));
+        }
+        return redirectPayment(res, order.status);
+      }
       try {
         const capture = await capturePayPalOrder({ id, reference: order.reference, amountCents: order.amountCents });
-        saveCapture.run(capture.status, capture.captureId ?? null, id);
-        return redirectPayment(res, findOrder.get(id, sessionId).status);
+        const saved = paymentLedger.saveCapture(id, capture);
+        return redirectPayment(res, saved.status);
       } catch (error) {
         console.error('PayPal Sandbox capture failed:', error.message);
         return redirectPayment(res, 'error');
@@ -540,4 +526,8 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(port, host, () => console.log(`Helpani Town running at ${origin}`));
+server.on('close', () => paymentReconciler.stop());
+server.listen(port, host, () => {
+  console.log(`Helpani Town running at ${origin}`);
+  paymentReconciler.start();
+});

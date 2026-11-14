@@ -112,6 +112,17 @@ let arrivalTimer;
 let medalTimer;
 let townMutation = 0, townLoad = 0;
 let sceneAssetsTarget = null, sceneAssetsGeneration = 0;
+let paymentRefreshTimer, paymentRefreshController;
+let paymentRefreshLoading = false, paymentPageActive = true;
+let paymentFeedbackMode, paymentFeedbackSnapshot;
+const paymentRefreshMs = 5_000;
+const paymentStatuses = {
+  completed: { badge: '沙箱付款完成', summary: (count) => `已完成 ${count} 笔` },
+  pending: { badge: '沙箱付款处理中', summary: (count) => `处理中 ${count} 笔` },
+  failed: { badge: '沙箱付款未完成', summary: (count) => `未完成 ${count} 笔` },
+  refunded: { badge: '沙箱付款已退款', summary: (count) => `已退款 ${count} 笔` },
+  partially_refunded: { badge: '沙箱付款部分退款', summary: (count) => `部分退款 ${count} 笔` },
+};
 
 function feedback(message, tone = 'normal') {
   const notice = element('feedback');
@@ -171,7 +182,8 @@ function renderRecords(state) {
       title: supply ? '遮光护理布 · 物资出资' : '海龟夜间观察站 · 捐助',
       detail: `${money(payment.amountCents)} · 沙箱测试资金`,
       fulfillment: supply && completed ? '物资待采购（演示）' : null,
-      badge: completed ? '沙箱付款完成' : '沙箱付款处理中',
+      followUp: payment.status === 'pending' ? 'PayPal 仍在处理，结果会自动更新。' : null,
+      badge: paymentStatuses[payment.status]?.badge || '沙箱付款待核对',
       completed,
     };
   });
@@ -210,6 +222,7 @@ function renderRecords(state) {
     const copy = make('div');
     copy.append(make('strong', record.title), make('p', record.detail));
     if (record.fulfillment) copy.append(make('p', record.fulfillment));
+    if (record.followUp) copy.append(make('p', record.followUp));
     row.append(copy, make('span', record.badge, record.completed ? 'tag tag-green' : 'tag tag-yellow'));
     list.append(row);
   }
@@ -755,6 +768,7 @@ function render() {
   renderArchive(state.medals);
   renderActivities(state);
   renderRecords(state);
+  renderPaymentFeedback();
 
   controls.allocate.disabled = busy || state.points < 100 || state.budgetCents < 200 || Boolean(state.allocatedCents);
   controls.allocate.textContent = state.allocatedCents ? '演示额度已预留' : '用 100 分预留 US$2';
@@ -767,6 +781,7 @@ function render() {
   });
   window.helpaniView = { state, busy, visible: activePage === 'town' && Boolean(state.pet) && !(choosingNext && canAdoptNext(state)) };
   window.dispatchEvent(new CustomEvent('helpani-state', { detail: window.helpaniView }));
+  schedulePaymentRefresh();
 }
 
 async function request(path, options) {
@@ -1025,12 +1040,80 @@ element('donation').addEventListener('submit', (event) => {
   checkout({ kind: 'donation', amountCents });
 });
 
-async function load(restoreAnchor = false) {
-  if (busy) return;
+function shouldRefreshPayments() {
+  return activePage === 'support' && paymentPageActive && !document.hidden
+    && navigator.onLine !== false && current?.payments.some((payment) => payment.status === 'pending');
+}
+
+function stopPaymentRefresh() {
+  clearTimeout(paymentRefreshTimer);
+  paymentRefreshTimer = undefined;
+  paymentRefreshController?.abort();
+}
+
+function schedulePaymentRefresh() {
+  clearTimeout(paymentRefreshTimer);
+  paymentRefreshTimer = undefined;
+  if (!shouldRefreshPayments() || busy || paymentRefreshLoading) return;
+  paymentRefreshTimer = setTimeout(() => {
+    paymentRefreshTimer = undefined;
+    load(false, { background: true });
+  }, paymentRefreshMs);
+}
+
+function resumePaymentRefresh() {
+  if (shouldRefreshPayments()) load(false, { background: true });
+}
+
+function renderPaymentFeedback(force = false) {
+  if (!paymentFeedbackMode || !current) return;
+  const snapshot = JSON.stringify(current.payments);
+  if (!force && paymentFeedbackSnapshot === snapshot) return;
+  // A later authoritative ledger result also supersedes a return-time error.
+  if (paymentFeedbackSnapshot !== snapshot) paymentFeedbackMode = 'ledger';
+  paymentFeedbackSnapshot = snapshot;
+  const notice = element('payment-feedback');
+  if (paymentFeedbackMode === 'ledger') {
+    const summary = Object.entries(paymentStatuses).map(([status, details]) => {
+      const count = current.payments.filter((payment) => payment.status === status).length;
+      return count ? details.summary(count) : null;
+    }).filter(Boolean);
+    // Keep each source fragment separate so every combination translates in
+    // both directions, including mixed success, failure and refund records.
+    notice.replaceChildren();
+    if (summary.length) {
+      notice.append(document.createTextNode('当前 PayPal 沙箱付款记录：'));
+      summary.forEach((text, index) => {
+        if (index) notice.append(document.createTextNode('，'));
+        notice.append(make('span', text));
+      });
+      notice.append(document.createTextNode('。请查看下方明细。'));
+    } else notice.textContent = '暂未查到 PayPal 沙箱付款确认记录，请核对下方支持记录。';
+    notice.dataset.tone = summary.length ? 'normal' : 'error';
+  } else {
+    notice.textContent = paymentFeedbackMode === 'cancelled'
+      ? '已从 PayPal 沙箱返回。请查看下方支持记录，也可以重新发起测试。'
+      : '本次返回未能确认付款结果，请核对下方支持记录。';
+    notice.dataset.tone = paymentFeedbackMode === 'error' ? 'error' : 'normal';
+  }
+  notice.hidden = false;
+}
+
+async function load(restoreAnchor = false, { background = false } = {}) {
+  if (busy || (background && (!shouldRefreshPayments() || paymentRefreshLoading))) return;
+  if (!background) paymentRefreshController?.abort();
+  const controller = background ? new AbortController() : null;
+  let timeout;
+  if (background) {
+    paymentRefreshLoading = true;
+    paymentRefreshController = controller;
+    timeout = setTimeout(() => controller.abort(), 10_000);
+  }
   const generation = ++townLoad, mutation = townMutation;
   try {
-    const latest = await request('/api/state');
+    const latest = await request('/api/state', controller ? { signal: controller.signal } : undefined);
     if (busy || mutation !== townMutation || generation !== townLoad) return;
+    if (background && JSON.stringify(latest) === JSON.stringify(current)) return;
     current = latest;
     render();
     const url = new URL(window.location.href);
@@ -1041,32 +1124,27 @@ async function load(restoreAnchor = false) {
     }
     const result = url.searchParams.get('payment');
     if (result) {
-      const completed = current.payments.filter((payment) => payment.status === 'completed').length;
-      const pending = current.payments.filter((payment) => payment.status === 'pending').length;
-      const summary = [completed && `已完成 ${completed} 笔`, pending && `处理中 ${pending} 笔`].filter(Boolean);
       // The return URL cannot identify a payment in this state response; only summarize the server ledger.
-      const confirmation = summary.length
-        ? `当前 PayPal 沙箱付款记录：${summary.join('，')}。请查看下方明细。`
-        : '暂未查到 PayPal 沙箱付款确认记录，请核对下方支持记录。';
-      const messages = {
-        completed: confirmation,
-        pending: confirmation,
-        cancelled: '已从 PayPal 沙箱返回。请查看下方支持记录，也可以重新发起测试。',
-        error: '本次返回未能确认付款结果，请核对下方支持记录。',
-      };
-      if (Object.hasOwn(messages, result)) {
-        const notice = element('payment-feedback');
-        notice.textContent = messages[result];
-        notice.dataset.tone = result === 'error' || (['completed', 'pending'].includes(result) && !summary.length) ? 'error' : 'normal';
-        notice.hidden = false;
+      if (Object.hasOwn(paymentStatuses, result) || ['cancelled', 'error'].includes(result)) {
+        paymentFeedbackMode = Object.hasOwn(paymentStatuses, result) ? 'ledger' : result;
+        paymentFeedbackSnapshot = JSON.stringify(current.payments);
+        renderPaymentFeedback(true);
       }
       url.searchParams.delete('payment');
       history.replaceState(null, '', url);
     }
   } catch {
     if (mutation !== townMutation || generation !== townLoad) return;
+    if (background) return; // Keep the last ledger visible; the next poll retries.
     feedback('未能读取小镇，请刷新后重试。', 'error');
     element('record-list').replaceChildren(make('li', '暂时无法读取演示记录。', 'empty-record'));
+  } finally {
+    clearTimeout(timeout);
+    if (controller && paymentRefreshController === controller) {
+      paymentRefreshController = undefined;
+      paymentRefreshLoading = false;
+    }
+    schedulePaymentRefresh();
   }
 }
 
@@ -1089,19 +1167,32 @@ const habitatObserver = new IntersectionObserver(([entry]) => {
 habitatObserver.observe(scene);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
+    stopPaymentRefresh();
     finishArrival();
     stopBehavior();
-  } else queueBehavior(1400);
+  } else {
+    queueBehavior(1400);
+    resumePaymentRefresh();
+  }
 });
 reducedMotion.addEventListener('change', () => {
   stopBehavior();
   if (current) render();
 });
 window.addEventListener('pagehide', () => {
+  paymentPageActive = false;
+  stopPaymentRefresh();
   finishArrival();
   stopBehavior();
 });
 window.helpaniCare={greet:greetPet};
 window.addEventListener('helpani-woodland-ready',()=>{if(current)render();});
 load(true);
-window.addEventListener('pageshow', (event) => { if (event.persisted) load(); });
+window.addEventListener('pageshow', (event) => {
+  paymentPageActive = true;
+  if (event.persisted) load();
+  else schedulePaymentRefresh();
+});
+window.addEventListener('online', resumePaymentRefresh);
+window.addEventListener('offline', stopPaymentRefresh);
+window.addEventListener('focus', resumePaymentRefresh);
